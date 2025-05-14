@@ -41780,13 +41780,11 @@ class ReportProcessor {
       } else {
         await summary.addRaw('⚠️ No report content available');
       }
-
+      summary.write();
       if(reportData?.report?.rich_html) {
         const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.rich_css}</style></head> ${reportData?.report?.rich_html}</html>`;
         await ArtifactManager.saveReportAsArtifact(report, buildName);
       }
-
-      return summary.write();
     } catch (error) {
       await core.info(`Error processing report: ${JSON.stringify(error)}`);
       await core.summary
@@ -41930,7 +41928,7 @@ class ArtifactManager {
       fs.mkdirSync(artifactDir, { recursive: true });
 
       // Create HTML file
-      const fileName = `index.html`;
+      const fileName = `report.html`;
       const filePath = path.join(artifactDir, fileName);
 
       // Write content
@@ -41952,7 +41950,7 @@ class ArtifactManager {
         core.warning('Artifact API not available. Report saved locally only.');
         return `File saved locally at: ${filePath}`;
       }
-      const artifactName = `browserstack-test-report`;
+      const artifactName = `browserstack`;
       
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,

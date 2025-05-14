@@ -15,13 +15,11 @@ class ReportProcessor {
       } else {
         await summary.addRaw('⚠️ No report content available');
       }
-
+      summary.write();
       if(reportData?.report?.rich_html) {
         const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.rich_css}</style></head> ${reportData?.report?.rich_html}</html>`;
         await ArtifactManager.saveReportAsArtifact(report, buildName);
       }
-
-      return summary.write();
     } catch (error) {
       await core.info(`Error processing report: ${JSON.stringify(error)}`);
       await core.summary

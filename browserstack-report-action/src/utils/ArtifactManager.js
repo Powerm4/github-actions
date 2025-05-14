@@ -18,7 +18,7 @@ class ArtifactManager {
       fs.mkdirSync(artifactDir, { recursive: true });
 
       // Create HTML file
-      const fileName = `index.html`;
+      const fileName = `report.html`;
       const filePath = path.join(artifactDir, fileName);
 
       // Write content
@@ -40,7 +40,7 @@ class ArtifactManager {
         core.warning('Artifact API not available. Report saved locally only.');
         return `File saved locally at: ${filePath}`;
       }
-      const artifactName = `browserstack-test-report`;
+      const artifactName = `browserstack`;
       
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
