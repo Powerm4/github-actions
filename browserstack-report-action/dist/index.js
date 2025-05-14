@@ -41933,9 +41933,14 @@ class ArtifactManager {
 
       // Write content
       fs.writeFileSync(filePath, report);
+      const fileStat = fs.statSync(filePath);
       core.exportVariable('BROWSERSTACK_REPORT_PATH', filePath);
+      core.setOutput('fileStat', fileStat);
       core.setOutput('report_file_path', filePath);
       core.setOutput('report_dir', artifactDir);
+
+      const dirContents = fs.readdirSync(artifactDir);
+      core.info(`Directory contents of ${artifactDir}: ${dirContents.join(', ')}`);
       
       // Upload as artifact 
       let artifactClient;
