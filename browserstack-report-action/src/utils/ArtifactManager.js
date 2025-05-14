@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const core = require('@actions/core');
-const artifact = require('@actions/artifact');
+const { create } = require('@actions/artifact');
 
 class ArtifactManager {
   static async saveReportAsArtifact(report, buildName) {
@@ -27,7 +27,7 @@ class ArtifactManager {
       fs.writeFileSync(filePath, report);
       
       // Upload as artifact
-      const artifactClient = artifact.DefaultArtifactClient();
+      const artifactClient = create();
       const artifactName = `browserstack-report-${sanitizedBuildName}`;
       
       const uploadResult = await artifactClient.uploadArtifact(
