@@ -41915,7 +41915,7 @@ module.exports = ReportService;
 const fs = __nccwpck_require__(9896);
 const path = __nccwpck_require__(6928);
 const core = __nccwpck_require__(7484);
-const { create } = __nccwpck_require__(7884);
+const artifact = __nccwpck_require__(7884);
 
 class ArtifactManager {
   static async saveReportAsArtifact(report, buildName) {

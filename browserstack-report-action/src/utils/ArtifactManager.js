@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const core = require('@actions/core');
-const { create } = require('@actions/artifact');
+const artifact = require('@actions/artifact');
 
 class ArtifactManager {
   static async saveReportAsArtifact(report, buildName) {
