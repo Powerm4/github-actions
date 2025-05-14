@@ -41957,7 +41957,7 @@ class ArtifactManager {
       
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
-        [filePath],
+        [fileName],
         artifactDir,
         { continueOnError: true }
       );
