@@ -26,8 +26,22 @@ class ArtifactManager {
       // Write content
       fs.writeFileSync(filePath, report);
       
-      // Upload as artifact
-      const artifactClient = create();
+      // Upload as artifact 
+      let artifactClient;
+      if (typeof artifact.create === 'function') {
+        artifactClient = artifact.create();
+        core.info('Created artifact client using create() function');
+      } else if (typeof artifact.default === 'function') {
+        artifactClient = artifact.default();
+        core.info('Created artifact client using default() function');
+      } else if (typeof artifact === 'function') {
+        artifactClient = artifact();
+        core.info('Created artifact client using artifact as function');
+      } else {
+        // Just save the file locally and return
+        core.warning('Artifact API not available. Report saved locally only.');
+        return `File saved locally at: ${filePath}`;
+      }
       const artifactName = `browserstack-report-${sanitizedBuildName}`;
       
       const uploadResult = await artifactClient.uploadArtifact(
