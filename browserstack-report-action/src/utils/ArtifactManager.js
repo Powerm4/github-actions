@@ -18,9 +18,7 @@ class ArtifactManager {
       fs.mkdirSync(artifactDir, { recursive: true });
 
       // Create HTML file
-      const sanitizedBuildName = buildName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const fileName = `browserstack-report-${sanitizedBuildName}-${timestamp}.html`;
+      const fileName = `index.html`;
       const filePath = path.join(artifactDir, fileName);
 
       // Write content
@@ -42,7 +40,7 @@ class ArtifactManager {
         core.warning('Artifact API not available. Report saved locally only.');
         return `File saved locally at: ${filePath}`;
       }
-      const artifactName = `browserstack-report-${sanitizedBuildName}`;
+      const artifactName = `browserstack-test-report`;
       
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
