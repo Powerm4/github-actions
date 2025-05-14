@@ -33563,18 +33563,18 @@ function resetPollCount() {
  */
 async function fetchDummyReportAPI(params, auth) {
   core.info(`Fetching report with params: ${JSON.stringify(params)}`);
-  
+
   // Create Authorization header
   const authHeader = Buffer.from(`${auth.username}:${auth.accessKey}`).toString('base64');
-  
+
   core.info(`Simulating API call with Username: ${auth.username} and Access Key: ****`);
-  
+
   return new Promise((resolve) => {
     setTimeout(() => {
       pollCount += 1;
       const build_uuid = `12345678jiji0987654321`;
       const build_integration = (pollCount % 2 === 0) ? constants.INTEGRATION_TYPE.SDK : constants.INTEGRATION_TYPE.NON_SDK;
-      
+
       const response = {
         build_uuid,
         build_integration,
@@ -33601,7 +33601,7 @@ async function fetchDummyReportAPI(params, auth) {
                        <p>Integration: ${build_integration}</p>
                        <p>Timestamp: ${params.build_creation_timestamp}</p>
                        <p>Status: All tests finished.</p>
-                       <pre>Some test results here...</pre>`
+                       <pre>Some test results here...</pre>`,
         };
         resolve(response);
       } else {
@@ -33614,7 +33614,7 @@ async function fetchDummyReportAPI(params, auth) {
                        <p>Integration: ${build_integration}</p>
                        <p>Timestamp: ${params.build_creation_timestamp}</p>
                        <p>Status: Build insights and test runs data available.</p>
-                       <pre>Detailed insights and test results...</pre>`
+                       <pre>Detailed insights and test results...</pre>`,
         };
         resolve(response);
       }
@@ -33633,9 +33633,24 @@ async function run() {
     // Get and validate inputs
     const actionInput = new ActionInput();
     const inputs = actionInput.getInputs();
-    
+
     // Destructure inputs
-    const { username, accessKey, buildName, userTimeout } = inputs;
+    const {
+      username, accessKey, buildName, userTimeout,
+    } = inputs;
+    const timeoutMs = userTimeout * 1000;
+    const startTime = Date.now();
+    let timeoutReached = false;
+
+    // Set up timeout tracking
+    const checkTimeout = () => {
+      const elapsedMs = Date.now() - startTime;
+      if (elapsedMs >= timeoutMs) {
+        timeoutReached = true;
+        return true;
+      }
+      return false;
+    };
 
     const buildCreationTimestamp = new Date().toISOString();
     const reportFormat = constants.REPORT_FORMAT.BASIC_HTML;
@@ -33659,15 +33674,15 @@ async function run() {
       build_creation_timestamp: buildCreationTimestamp,
       report_format: reportFormat,
       requesting_ci: requestingCI,
-      request_type: 'first',
+      request_type: 'FIRST',
       user_timeout: userTimeout,
     };
-    
+
     const auth = {
       username,
-      accessKey
+      accessKey,
     };
-    
+
     reportData = await fetchDummyReportAPI(initialApiParams, auth);
     reportStatus = reportData.report_status;
     pollingIntervalSeconds = reportData.polling_interval || constants.DEFAULT_POLLING_INTERVAL_SECONDS;
@@ -33682,11 +33697,11 @@ async function run() {
         core.info(`Polling attempt #${retries + 1} (overall attempt ${pollCount})`);
         const apiParams = {
           build_name: buildName,
-          build_creation_timestamp: buildCreationTimestamp,
+          build_created_at: buildCreationTimestamp,
           report_format: reportFormat,
           requesting_ci: requestingCI,
           user_timeout: userTimeout,
-          request_type: retries === maxRetries ? 'last' : 'polling',
+          request_type: retries === maxRetries ? 'LAST' : 'POLL',
         };
         reportData = await fetchDummyReportAPI(apiParams, auth);
         reportStatus = reportData.report_status;
@@ -33702,27 +33717,32 @@ async function run() {
           await core.summary.write();
           return;
         }
-        
-        core.setFailed('Report status is complete/tests_available, but HTML report content is missing.');
+
+        core.setFailed('Report status is completed, but HTML report content is missing.');
         return;
-      } else if (reportStatus === constants.REPORT_STATUS.IN_PROGRESS) {
+      } if (reportStatus === constants.REPORT_STATUS.IN_PROGRESS) {
         if (retries < maxRetries) {
           core.info(`Report is still in progress. Retrying in ${pollingIntervalSeconds} seconds...`);
-          await new Promise(resolve => setTimeout(resolve, pollingIntervalSeconds * 10)); // Use 10ms for faster tests
+          await new Promise((resolve) => setTimeout(resolve, pollingIntervalSeconds * 10)); // Use 10ms for faster tests
         } else {
-          core.setFailed(`Polling timed out after ${maxRetries} retries. Last status: ${reportStatus}`);
+          core.setFailed(`Report Fetching timed out after ${maxRetries} retries. Last status: ${reportStatus}`);
           return;
         }
       } else { // "not_available", "build_not_found", "more_than_one_build_found"
-        core.setFailed(`Report generation failed with status: ${reportStatus}. Build UUID: ${reportData.build_uuid || 'N/A'}`);
+        if (reportData.report && reportData.report.basic_html) {
+          core.summary.addRaw(reportData.report.basic_html);
+          await core.summary.write();
+          return;
+        }
+        core.setFailed('Report not found');
         return;
       }
       retries += 1;
     }
-    
+
     // If loop finishes without returning, it means maxRetries was hit with last status being in_progress
     if (reportStatus === constants.REPORT_STATUS.IN_PROGRESS) {
-      core.setFailed(`Polling timed out after ${maxRetries} retries. Final status was '${constants.REPORT_STATUS.IN_PROGRESS}'.`);
+      core.setFailed(`Report Fetching timed out after ${maxRetries} retries. Final status was '${constants.REPORT_STATUS.IN_PROGRESS}'.`);
     }
   } catch (error) {
     core.setFailed(`Action failed with error: ${error.message}`);

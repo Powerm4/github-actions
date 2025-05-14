@@ -3,10 +3,10 @@ description: 'Fetches a BrowserStack report and displays it in the GitHub Action
 author: 'GitHub Copilot'
 
 inputs:
-  browserstack-username:
+  username:
     description: 'Your BrowserStack username.'
     required: true
-  browserstack-access-key:
+  access-key:
     description: 'Your BrowserStack access key.'
     required: true
   build-name:
