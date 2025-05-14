@@ -69,9 +69,6 @@ class MockReportService {
       report: {
         basic_html: `
 <html>
-<head>
-  <title>Build Insights</title>
-</head>
 <body>
 
   <h2>Build Insights</h2>
