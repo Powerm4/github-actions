@@ -49,10 +49,10 @@ class ArtifactManager {
         return `File saved locally at: ${filePath}`;
       }
       const artifactName = `browserstack`;
-      
+      const relativeFilePath = path.relative(artifactDir, filePath);
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
-        [fileName],
+        [relativeFilePath],
         artifactDir,
         { continueOnError: true }
       );
