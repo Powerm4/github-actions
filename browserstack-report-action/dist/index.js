@@ -38202,7 +38202,7 @@ async function run() {
       pollingInterval
     );
 
-    await ReportProcessor.processReport(reportData);
+    await ReportProcessor.processReport(reportData, buildName);
   } catch (error) {
     core.setFailed(`Action failed: ${error.message}`);
   }
@@ -38291,7 +38291,6 @@ class MockReportService {
       build_uuid: 'mock-build-123',
       report: {
         basic_html: `
-<html>
 <body>
 
   <h2>Build Insights</h2>
@@ -38402,8 +38401,257 @@ class MockReportService {
   </table>
 
 </body>
-</html>
-        `
+        `,
+        rich_html: `<body>
+
+    <h2>Build Insights</h2>
+
+    <div class="grid-container">
+        <div class="metric-card">
+            <h1>5</h1>
+            <p>All</p>
+        </div>
+        <div class="metric-card passed">
+            <h1>2</h1>
+            <p>Passed</p>
+        </div>
+        <div class="metric-card failed">
+            <h1>2</h1>
+            <p>Failed</p>
+        </div>
+        <div class="metric-card skipped">
+            <h1>1</h1>
+            <p>Skipped</p>
+        </div>
+        <div class="metric-card unknown">
+            <h1>0</h1>
+            <p>Unknown</p>
+        </div>
+    </div>
+
+    <div class="grid-metrics">
+        <div class="metric-box">
+            <h2>New Failures</h2>
+            <h4><a href="<https://observability.browserstack.com/projects/WDIO+Cucumber+GH/builds/Sanity+Only+Chrome/4052?tab=insights>" target="_blank">View</a></h4>
+        </div>
+        <div class="metric-box">
+            <h2>Always Failing</h2>
+            <h4><a href="<https://observability.browserstack.com/projects/WDIO+Cucumber+GH/builds/Sanity+Only+Chrome/4052?tab=insights>" target="_blank">View</a></h4>
+        </div>
+        <div class="metric-box">
+            <h2>Flaky Test</h2>
+            <h4><a href="<https://observability.browserstack.com/projects/WDIO+Cucumber+GH/builds/Sanity+Only+Chrome/4052?tab=insights>" target="_blank">View</a></h4>
+        </div>
+        <div class="metric-box">
+            <h2>Muted Tests</h2>
+            <h4><a href="<https://observability.browserstack.com/projects/WDIO+Cucumber+GH/builds/Sanity+Only+Chrome/4052?tab=insights>" target="_blank">View</a></h4>
+        </div>
+        <div class="metric-box">
+            <h2>Unique Errors</h2>
+            <h4><a href="<https://observability.browserstack.com/projects/WDIO+Cucumber+GH/builds/Sanity+Only+Chrome/4052?tab=insights>" target="_blank">View</a></h4>
+        </div>
+        <div class="metric-box">
+            <h2>Performance Anomaly</h2>
+            <h4><a href="<https://observability.browserstack.com/projects/WDIO+Cucumber+GH/builds/Sanity+Only+Chrome/4052?tab=insights>" target="_blank">View</a></h4>
+        </div>
+    </div>
+
+    <div class="w3-panel w3-light-grey w3-border w3-round">
+        <p>Note: Click view or add report timeout in plugin settings to see build insights above.</p>
+    </div>
+    <br>
+
+    <h2>Test List</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Test Name</th>
+                <th>Status</th>
+                <th>Test History</th>
+                <th>Browser/Device</th>
+                <th>OS</th>
+                <th>Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="test-link"><a href="<https://observability.browserstack.com/projects/WDIO+Cucumber+GH/builds/Sanity+Only+Chrome/4052?tab=tests&details=1327748286>" target="_blank">Refresh API User token - Step not defined</a></td>
+                <td class="status-skipped">Skipped</td>
+                <td class="test-history"><a href="<https://observability.browserstack.com/projects/WDIO+Cucumber+GH/builds/Sanity+Only+Chrome/4052?tab=tests&details=1327748286&utm_medium=cicd&utm_source=jenkins>" target="_blank">View History</a></td>
+                <td>Chrome 135</td>
+                <td>OS X</td>
+                <td>92s</td>
+            </tr>
+            <tr>
+                <td class="test-link"><a href="#">Delete Account via API - Step Pending</a></td>
+                <td class="status-failed">Failed</td>
+                <td class="test-history"><a href="#">View History</a></td>
+                <td>Google Pixel 7</td>
+                <td>Android 12</td>
+                <td>180s</td>
+            </tr>
+            <tr>
+                <td class="test-link"><a href="#">BStack Demo API</a></td>
+                <td class="status-passed">Passed</td>
+                <td class="test-history"><a href="#">View History</a></td>
+                <td>Samsung Galaxy Tab S8</td>
+                <td>Android 12</td>
+                <td>134s</td>
+            </tr>
+            <tr>
+                <td class="test-link"><a href="#">Verify API Create Account (fred, password789)</a></td>
+                <td class="status-failed">Failed</td>
+                <td class="test-history"><a href="#">View History</a></td>
+                <td>iPhone 14 Pro</td>
+                <td>iOS 15.5</td>
+                <td>221s</td>
+            </tr>
+            <tr>
+                <td class="test-link"><a href="#">Verify API User Address</a></td>
+                <td class="status-passed">Passed</td>
+                <td class="test-history"><a href="#">View History</a></td>
+                <td>Chrome 135</td>
+                <td>Windows 11</td>
+                <td>102s</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>`,
+        rich_css: `body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fb;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-top: 5px;
+            margin-bottom: 15px;
+            color: #2b3e50;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+            max-width: 1000px;
+        }
+
+        .metric-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .metric-card h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .passed {
+            color: green;
+        }
+
+        .failed {
+            color: red;
+        }
+
+        .skipped,
+        .unknown {
+            color: #6c757d;
+        }
+
+        .grid-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 1000px;
+        }
+
+        .metric-box {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .metric-box h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .metric-box h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+
+
+        .metric-box p {
+            font-size: 14px;
+            color: #666;
+            margin: 8px 0 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f3f5;
+            font-weight: bold;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-passed {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-failed {
+            color: red;
+            font-weight: bold;
+        }
+
+        .status-skipped {
+            color: #6c757d;
+            font-weight: bold;
+        }
+
+        .test-link a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .test-history a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .metric-box a {
+            text-decoration: none;
+            color: #007bff;
+        }`
       }
     };
   }
@@ -38421,20 +38669,25 @@ module.exports = new MockReportService(); // Export singleton instance
 
 
 const core = __nccwpck_require__(7484);
+const ArtifactManager = __nccwpck_require__(197);
 
 class ReportProcessor {
-  static async processReport(reportData) {
+  static async processReport(reportData, buildName) {
     try {
       const summary = core.summary;
       await summary.addHeading('BrowserStack Test Report');
 
-      // Process report content - both success and error cases come in report_html
       if (reportData?.report?.basic_html) {
-        await summary.addRaw(reportData?.report?.basic_html);
+        await summary.addRaw(`<html>${reportData.report.basic_html}</html>`);
+        
       } else {
         await summary.addRaw('⚠️ No report content available');
       }
 
+      if(reportData?.report?.rich_html) {
+        const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.rich_css}</style></head> ${reportData?.report?.rich_html}</html>`;
+        await ArtifactManager.saveReportAsArtifact(report, buildName);
+      }
 
       return summary.write();
     } catch (error) {
@@ -38556,6 +38809,68 @@ module.exports = ReportService;
 
 /***/ }),
 
+/***/ 197:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const fs = __nccwpck_require__(9896);
+const path = __nccwpck_require__(6928);
+const core = __nccwpck_require__(7484);
+const artifact = __nccwpck_require__(1841);
+
+class ArtifactManager {
+  static async saveReportAsArtifact(report, buildName) {
+    if (!report) {
+      core.debug('No HTML content available to save as artifact');
+      return '';
+    }
+
+    try {
+      // Create artifacts directory
+      const artifactDir = path.join(process.env.GITHUB_WORKSPACE || '.', 'browserstack-artifacts');
+      fs.mkdirSync(artifactDir, { recursive: true });
+
+      // Create HTML file
+      const sanitizedBuildName = buildName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const fileName = `browserstack-report-${sanitizedBuildName}-${timestamp}.html`;
+      const filePath = path.join(artifactDir, fileName);
+
+      // Write content
+      fs.writeFileSync(filePath, report);
+      
+      // Upload as artifact
+      const artifactClient = artifact.create();
+      const artifactName = `browserstack-report-${sanitizedBuildName}`;
+      
+      const uploadResult = await artifactClient.uploadArtifact(
+        artifactName,
+        [filePath],
+        artifactDir,
+        { continueOnError: true }
+      );
+
+      if (uploadResult.failedItems.length > 0) {
+        core.warning(`Failed to upload artifacts: ${uploadResult.failedItems.join(', ')}`);
+        return '';
+      }
+
+      core.info(`Report saved as artifact: ${artifactName}`);
+      return `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${uploadResult.artifactId}`;
+    } catch (error) {
+      core.warning(`Failed to save artifact: ${error.message}`);
+      return '';
+    }
+  }
+}
+
+module.exports = ArtifactManager;
+
+
+/***/ }),
+
 /***/ 933:
 /***/ ((module) => {
 
@@ -38576,6 +38891,14 @@ class TimeoutManager {
 }
 
 module.exports = TimeoutManager;
+
+
+/***/ }),
+
+/***/ 1841:
+/***/ ((module) => {
+
+module.exports = eval("require")("@actions/artifact");
 
 
 /***/ }),

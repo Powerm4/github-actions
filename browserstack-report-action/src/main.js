@@ -44,7 +44,7 @@ async function run() {
       pollingInterval
     );
 
-    await ReportProcessor.processReport(reportData);
+    await ReportProcessor.processReport(reportData, buildName);
   } catch (error) {
     core.setFailed(`Action failed: ${error.message}`);
   }

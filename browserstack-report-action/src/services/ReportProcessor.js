@@ -1,20 +1,25 @@
 'use strict';
 
 const core = require('@actions/core');
+const ArtifactManager = require('../utils/ArtifactManager');
 
 class ReportProcessor {
-  static async processReport(reportData) {
+  static async processReport(reportData, buildName) {
     try {
       const summary = core.summary;
       await summary.addHeading('BrowserStack Test Report');
 
-      // Process report content - both success and error cases come in report_html
       if (reportData?.report?.basic_html) {
-        await summary.addRaw(reportData?.report?.basic_html);
+        await summary.addRaw(`<html>${reportData.report.basic_html}</html>`);
+        
       } else {
         await summary.addRaw('⚠️ No report content available');
       }
 
+      if(reportData?.report?.rich_html) {
+        const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.rich_css}</style></head> ${reportData?.report?.rich_html}</html>`;
+        await ArtifactManager.saveReportAsArtifact(report, buildName);
+      }
 
       return summary.write();
     } catch (error) {
