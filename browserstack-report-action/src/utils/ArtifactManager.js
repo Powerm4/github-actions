@@ -27,10 +27,10 @@ class ArtifactManager {
       fs.writeFileSync(filePath, report);
       
       // Upload as artifact
-      const artifactClient = artifact.createArtifactClient();
+      // const artifactClient = artifact.createArtifactClient();
       const artifactName = `browserstack-report-${sanitizedBuildName}`;
       
-      const uploadResult = await artifactClient.uploadArtifact(
+      const uploadResult = await artifact.uploadArtifact(
         artifactName,
         [filePath],
         artifactDir,
