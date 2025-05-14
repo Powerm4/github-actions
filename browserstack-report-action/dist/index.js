@@ -41933,6 +41933,9 @@ class ArtifactManager {
 
       // Write content
       fs.writeFileSync(filePath, report);
+      core.exportVariable('BROWSERSTACK_REPORT_PATH', filePath);
+      core.setOutput('report_file_path', filePath);
+      core.setOutput('report_dir', artifactDir);
       
       // Upload as artifact 
       let artifactClient;
