@@ -47,7 +47,7 @@ class ArtifactManager {
       
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
-        [fileName],
+        [filePath],
         artifactDir,
         { continueOnError: true }
       );
