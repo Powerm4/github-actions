@@ -1,8 +1,8 @@
 module.exports = {
   // Default values
-  DEFAULT_POLLING_INTERVAL_SECONDS: 30,
-  DEFAULT_MAX_RETRIES: 10,
-  DEFAULT_USER_TIMEOUT_SECONDS: 300,
+  DEFAULT_POLLING_INTERVAL_SECONDS: 3,
+  DEFAULT_MAX_RETRIES: 3,
+  DEFAULT_USER_TIMEOUT_SECONDS: 10,
 
   // API simulation constants
   MAX_POLLS_FOR_IN_PROGRESS: 3,
@@ -10,6 +10,7 @@ module.exports = {
   // Report formats
   REPORT_FORMAT: {
     BASIC_HTML: 'basic_html',
+    RICH_HTML: 'rich_html',
   },
 
   INPUT: {
@@ -38,5 +39,12 @@ module.exports = {
   // CI system identifiers
   CI_SYSTEM: {
     GITHUB_ACTIONS: 'github-actions',
+  },
+
+  //REPORT_REQUEST_STATE
+  REPORT_REQUEST_STATE: {
+    FIRST: 'FIRST',
+    POLL: 'POLL',
+    LAST: 'LAST',
   },
 };
