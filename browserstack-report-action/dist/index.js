@@ -38172,7 +38172,8 @@ async function run() {
       core.info('Running in test mode with mock API responses');
     }
 
-    const timeoutManager = new TimeoutManager(userTimeout);
+    const timeoutManager = new TimeoutManager(userTimeout
+      || constants.DEFAULT_USER_TIMEOUT_SECONDS);
     const reportService = new ReportService(authHeader, isTestMode);
 
     const initialParams = {
@@ -38186,7 +38187,15 @@ async function run() {
 
     timeoutManager.check();
     const initialReport = await reportService.fetchReport(initialParams);
-    const { retryCount: maxRetries, pollingInterval } = initialReport;
+    let { retryCount: maxRetries, pollingInterval } = initialReport;
+
+    if (!pollingInterval) {
+      pollingInterval = constants.DEFAULT_POLLING_INTERVAL_SECONDS;
+    }
+
+    if (!maxRetries) {
+      maxRetries = constants.DEFAULT_MAX_RETRIES;
+    }
 
     const reportData = await reportService.pollReport(
       initialParams,
