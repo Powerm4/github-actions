@@ -51,13 +51,11 @@ class ArtifactManager {
         return `File saved locally at: ${filePath}`;
       }
       const artifactName = `browserstack`;
-      // const cwdPath = path.join(process.cwd(), 'browserstack-artifacts/reports.html');
-      // fs.copyFileSync(filePath, cwdPath);
-      // core.info(`Copied report to ${cwdPath}`);
+      const fileNPath = path.join('browserstack-artifacts', fileName);
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
-        [`report.html`],
-        'browserstack-artifacts',
+        [path.resolve(fileNPath)],          
+        path.resolve('browserstack-artifacts'),    
         { continueOnError: true }
       );
 
