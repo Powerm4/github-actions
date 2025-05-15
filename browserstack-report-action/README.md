@@ -40,7 +40,7 @@ jobs:
           access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           build-name: 'My Awesome App E2E Tests'
         #user-timeout can be specified if needed, e.g.:
-          rser-timeout: '10'
+          report-timeout: '10'
 ```
 
 ## Development
