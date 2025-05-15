@@ -1,5 +1,3 @@
-'use strict';
-
 const github = require('@actions/github');
 const constants = require('../../config/constants');
 

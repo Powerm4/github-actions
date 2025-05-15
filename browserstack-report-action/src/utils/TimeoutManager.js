@@ -1,5 +1,3 @@
-'use strict';
-
 class TimeoutManager {
   constructor(timeoutSeconds) {
     this.timeoutMs = timeoutSeconds * 1000;

@@ -1,5 +1,3 @@
-'use strict';
-
 const core = require('@actions/core');
 const constants = require('../config/constants');
 const ActionInput = require('./actionInput');
@@ -12,7 +10,9 @@ async function run() {
     core.info('Starting BrowserStack Report Action...');
 
     const actionInput = new ActionInput();
-    const { username, accessKey, buildName, userTimeout } = actionInput.getInputs();
+    const {
+      username, accessKey, buildName, userTimeout,
+    } = actionInput.getInputs();
     const authHeader = `Basic ${Buffer.from(`${username}:${accessKey}`).toString('base64')}`;
 
     // Enable test mode if environment variable is set
@@ -25,23 +25,23 @@ async function run() {
     const reportService = new ReportService(authHeader, isTestMode);
 
     const initialParams = {
-      build_name: buildName,
-      build_created_at: new Date().toISOString(),
-      requesting_ci: constants.CI_SYSTEM.GITHUB_ACTIONS,
-      report_format: [constants.REPORT_FORMAT.BASIC_HTML, constants.REPORT_FORMAT.RICH_HTML ],
-      request_type: constants.REPORT_REQUEST_STATE.FIRST,
-      user_timeout: userTimeout,
+      originalBuildName: buildName,
+      buildCreatedAt: new Date().toISOString(),
+      requestingCi: constants.CI_SYSTEM.GITHUB_ACTIONS,
+      reportFormat: [constants.REPORT_FORMAT.BASIC_HTML, constants.REPORT_FORMAT.RICH_HTML],
+      requestType: constants.REPORT_REQUEST_STATE.FIRST,
+      userTimeout,
     };
 
     timeoutManager.check();
     const initialReport = await reportService.fetchReport(initialParams);
-    const { retry_count: maxRetries, polling_interval: pollingInterval } = initialReport;
+    const { retryCount: maxRetries, pollingInterval } = initialReport;
 
     const reportData = await reportService.pollReport(
       initialParams,
       timeoutManager,
       maxRetries,
-      pollingInterval
+      pollingInterval,
     );
 
     await ReportProcessor.processReport(reportData);

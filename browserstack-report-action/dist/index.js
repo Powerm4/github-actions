@@ -23,7 +23,7 @@ module.exports = {
     USERNAME: 'username',
     ACCESS_KEY: 'access-key',
     BUILD_NAME: 'build-name',
-    TIMEOUT: 'report-timeout'
+    TIMEOUT: 'report-timeout',
   },
 
   // Report statuses
@@ -47,7 +47,7 @@ module.exports = {
     GITHUB_ACTIONS: 'github-actions',
   },
 
-  //REPORT_REQUEST_STATE
+  // REPORT_REQUEST_STATE
   REPORT_REQUEST_STATE: {
     FIRST: 'FIRST',
     POLL: 'POLL',
@@ -37950,9 +37950,6 @@ function wrappy (fn, cb) {
 /***/ 460:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-"use strict";
-
-
 const core = __nccwpck_require__(7484);
 const InputValidator = __nccwpck_require__(3000);
 const { INPUT } = __nccwpck_require__(9350);
@@ -38024,9 +38021,6 @@ module.exports = ActionInput;
 
 /***/ 3000:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
 
 const github = __nccwpck_require__(3228);
 const constants = __nccwpck_require__(9350);
@@ -38155,9 +38149,6 @@ module.exports = InputValidator;
 /***/ 7936:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-"use strict";
-
-
 const core = __nccwpck_require__(7484);
 const constants = __nccwpck_require__(9350);
 const ActionInput = __nccwpck_require__(460);
@@ -38170,7 +38161,9 @@ async function run() {
     core.info('Starting BrowserStack Report Action...');
 
     const actionInput = new ActionInput();
-    const { username, accessKey, buildName, userTimeout } = actionInput.getInputs();
+    const {
+      username, accessKey, buildName, userTimeout,
+    } = actionInput.getInputs();
     const authHeader = `Basic ${Buffer.from(`${username}:${accessKey}`).toString('base64')}`;
 
     // Enable test mode if environment variable is set
@@ -38183,23 +38176,23 @@ async function run() {
     const reportService = new ReportService(authHeader, isTestMode);
 
     const initialParams = {
-      build_name: buildName,
-      build_created_at: new Date().toISOString(),
-      requesting_ci: constants.CI_SYSTEM.GITHUB_ACTIONS,
-      report_format: [constants.REPORT_FORMAT.BASIC_HTML, constants.REPORT_FORMAT.RICH_HTML ],
-      request_type: constants.REPORT_REQUEST_STATE.FIRST,
-      user_timeout: userTimeout,
+      originalBuildName: buildName,
+      buildCreatedAt: new Date().toISOString(),
+      requestingCi: constants.CI_SYSTEM.GITHUB_ACTIONS,
+      reportFormat: [constants.REPORT_FORMAT.BASIC_HTML, constants.REPORT_FORMAT.RICH_HTML],
+      requestType: constants.REPORT_REQUEST_STATE.FIRST,
+      userTimeout,
     };
 
     timeoutManager.check();
     const initialReport = await reportService.fetchReport(initialParams);
-    const { retry_count: maxRetries, polling_interval: pollingInterval } = initialReport;
+    const { retryCount: maxRetries, pollingInterval } = initialReport;
 
     const reportData = await reportService.pollReport(
       initialParams,
       timeoutManager,
       maxRetries,
-      pollingInterval
+      pollingInterval,
     );
 
     await ReportProcessor.processReport(reportData);
@@ -38219,9 +38212,6 @@ if (require.main === require.cache[eval('__filename')]) {
 
 /***/ 3169:
 /***/ ((module) => {
-
-"use strict";
-
 
 class MockReportService {
   constructor() {
@@ -38249,48 +38239,48 @@ class MockReportService {
       return this.customResponse;
     }
 
-    this.pollCount++;
+    this.pollCount += 1;
 
     // Simulate different scenarios based on poll count
     if (this.shouldFail) {
       return {
-        report_status: 'ERROR',
+        reportStatus: 'ERROR',
         report: {
-          basic_html: '<pre>Error: Mock API Error</pre>'
-        }
+          basicHtml: '<pre>Error: Mock API Error</pre>',
+        },
       };
     }
 
     if (this.pollCount === 1) {
       // First call returns configuration
       return {
-        report_status: 'IN_PROGRESS',
-        retry_count: 3,
-        polling_interval: 1, // 1 second for faster tests
-        build_uuid: 'mock-build-123',
+        reportStatus: 'IN_PROGRESS',
+        retryCount: 3,
+        pollingInterval: 1, // 1 second for faster tests
+        buildUuid: 'mock-build-123',
         report: {
-          basic_html: '<pre>Build found, generating report...</pre>'
-        }
+          basicHtml: '<pre>Build found, generating report...</pre>',
+        },
       };
     }
 
     if (this.pollCount < 3) {
       // Still processing
       return {
-        report_status: 'IN_PROGRESS',
-        build_uuid: 'mock-build-123',
+        reportStatus: 'IN_PROGRESS',
+        buildUuid: 'mock-build-123',
         report: {
-          basic_html: '<pre>Report generation in progress... Attempt ' + this.pollCount + '</pre>'
-        }
+          basicHtml: `<pre>Report generation in progress... Attempt ${this.pollCount}</pre>`,
+        },
       };
     }
 
     // Success after 3 polls
     return {
-      report_status: 'COMPLETED',
-      build_uuid: 'mock-build-123',
+      reportStatus: 'COMPLETED',
+      buildUuid: 'mock-build-123',
       report: {
-        basic_html: `
+        basicHtml: `
 <body>
 
   <h2>Build Insights</h2>
@@ -38402,7 +38392,7 @@ class MockReportService {
 
 </body>
         `,
-        rich_html: `<body>
+        richHtml: `<body>
 
     <h2>Build Insights</h2>
 
@@ -38519,7 +38509,7 @@ class MockReportService {
     </table>
 
 </body>`,
-        rich_css: `body {
+        richCss: `body {
             font-family: 'Arial', sans-serif;
             background-color: #f8f9fb;
             padding: 20px;
@@ -38651,8 +38641,8 @@ class MockReportService {
         .metric-box a {
             text-decoration: none;
             color: #007bff;
-        }`
-      }
+        }`,
+      },
     };
   }
 }
@@ -38665,27 +38655,23 @@ module.exports = new MockReportService(); // Export singleton instance
 /***/ 4140:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-"use strict";
-
-
 const core = __nccwpck_require__(7484);
 const UploadFileForArtifact = __nccwpck_require__(8751);
 
 class ReportProcessor {
   static async processReport(reportData) {
     try {
-      const summary = core.summary;
+      const { summary } = core;
       await summary.addHeading('BrowserStack Test Report');
 
-      if (reportData?.report?.basic_html) {
-        await summary.addRaw(`<html>${reportData.report.basic_html}</html>`);
-        
+      if (reportData?.report?.basicHtml) {
+        await summary.addRaw(`<html>${reportData.report.basicHtml}</html>`);
       } else {
         await summary.addRaw('⚠️ No report content available');
       }
       summary.write();
-      if(reportData?.report?.rich_html) {
-        const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.rich_css}</style></head> ${reportData?.report?.rich_html}</html>`;
+      if (reportData?.report?.richHtml) {
+        const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.richCss}</style></head> ${reportData?.report?.richHtml}</html>`;
         await UploadFileForArtifact.saveReportInFile(report);
       }
     } catch (error) {
@@ -38705,9 +38691,6 @@ module.exports = ReportProcessor;
 
 /***/ 9427:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
 
 const axios = __nccwpck_require__(7269);
 const core = __nccwpck_require__(7484);
@@ -38729,75 +38712,65 @@ class ReportService {
     try {
       const response = await axios.post(this.apiUrl, params, {
         headers: {
-          Authorization: authHeader,
+          Authorization: this.authHeader,
         },
       });
-      if(response.status < 200 || response.status > 299) {
-        return errorResponse(response?.data?.error_message || "Something Went Wrong while Fetching report");
+      if (response.status < 200 || response.status > 299) {
+        return this.errorResponse(response?.data?.errorMessage || "Something Went Wrong while Fetching report");
       }
       return response.data;
     } catch (error) {
       core.info(`Error fetching report: ${error.message}`);
-      return errorResponse();
+      return this.errorResponse();
     }
   }
 
-  errorResponse(errorMessage) {
+  static errorResponse(errorMessage) {
     return {
-      report:  { basic_html: `<pre>${errorMessage ? errorMessage: "Something Went Wrong while Fetching report"}</pre>` },
-      report_status: 'ERROR'
+      report: { basicHtml: `<pre>${errorMessage || "Something Went Wrong while Fetching report"}</pre>` },
+      reportStatus: 'ERROR',
     };
   }
 
   async pollReport(params, timeoutManager, maxRetries, pollingInterval) {
-    let retries = 0;
-    let reportData;
-
-    while (retries <= maxRetries) {
+    const poll = async (retries) => {
       timeoutManager.check();
-      
-      reportData = await this.fetchReport({
+
+      const reportData = await this.fetchReport({
         ...params,
-        request_type: retries === maxRetries - 1 ? constants.REPORT_REQUEST_STATE.LAST : constants.REPORT_REQUEST_STATE.POLL,
+        requestType: retries === maxRetries - 1 ? constants.REPORT_REQUEST_STATE.LAST
+          : constants.REPORT_REQUEST_STATE.POLL,
       });
-      
-      const status = reportData.report_status;
+
+      const status = reportData.reportStatus;
       if (status === 'COMPLETED' || status === 'TEST_AVAILABLE') {
         return reportData;
       }
-      
+
       if (status === 'IN_PROGRESS' && retries < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, pollingInterval * 1000));
-        retries++;
-        continue;
+        await new Promise((resolve) => setTimeout(resolve, pollingInterval * 1000));
+        return poll(retries + 1);
       }
-      
+
       // Instead of throwing, return error data that can be displayed
       return this.handleErrorStatus(status, reportData);
-    }
-
-    // Return timeout error data
-    return {
-      error_message: `Report generation failed after ${maxRetries} retries`,
-      report_status: 'TIMEOUT',
-      report: {
-        basic_html: `<pre>Report generation got timedout, please try increasing report timeout</pre>`,
-      }
     };
+
+    return poll(0);
   }
 
-  handleErrorStatus(status, reportData) {
+  static handleErrorStatus(status, reportData) {
     const errorMessages = {
-      'BUILD_NOT_FOUND': 'Build not found in BrowserStack',
-      'MULTIPLE_BUILD_FOUND': 'Multiple builds found with the same name',
-      'DATA_NOT_AVAILABLE': 'Report data not available from BrowserStack',
-      'ERROR': 'Error occurred while fetching report',
+      BUILD_NOT_FOUND: 'Build not found in BrowserStack',
+      MULTIPLE_BUILD_FOUND: 'Multiple builds found with the same name',
+      DATA_NOT_AVAILABLE: 'Report data not available from BrowserStack',
+      ERROR: 'Error occurred while fetching report',
     };
 
     return {
-      error_message: errorMessages[status] || `Unexpected status: ${status}`,
-      report_status: status,
-      report : reportData.report,
+      errorMessage: errorMessages[status] || `Unexpected status: ${status}`,
+      reportStatus: status,
+      report: reportData.report,
     };
   }
 }
@@ -38809,9 +38782,6 @@ module.exports = ReportService;
 
 /***/ 933:
 /***/ ((module) => {
-
-"use strict";
-
 
 class TimeoutManager {
   constructor(timeoutSeconds) {
@@ -38834,9 +38804,6 @@ module.exports = TimeoutManager;
 /***/ 8751:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-"use strict";
-
-
 const fs = __nccwpck_require__(9896);
 const path = __nccwpck_require__(6928);
 const core = __nccwpck_require__(7484);
@@ -38849,17 +38816,17 @@ class UploadFileForArtifact {
     }
 
     try {
-      const pathName = "browserstack-reports-atifact"
+      const pathName = "browserstack-reports-atifact";
       const fileName = `bstack-report.html`;
       const artifactName = "browserstack-report";
       // Create artifacts directory
       fs.mkdirSync(pathName, { recursive: true });
-      //save path in a env variable
+      // save path in a env variable
       core.exportVariable('BROWSERSTACK_REPORT_PATH', pathName);
       core.exportVariable("BROWSERSTACK_REPORT_NAME", artifactName);
 
       // Write content
-      fs.writeFileSync(path.join(pathName,fileName), report);
+      fs.writeFileSync(path.join(pathName, fileName), report);
     } catch (error) {
       core.warning(`Failed to save file: ${error.message}`);
       return '';

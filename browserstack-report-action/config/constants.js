@@ -17,7 +17,7 @@ module.exports = {
     USERNAME: 'username',
     ACCESS_KEY: 'access-key',
     BUILD_NAME: 'build-name',
-    TIMEOUT: 'report-timeout'
+    TIMEOUT: 'report-timeout',
   },
 
   // Report statuses
@@ -41,7 +41,7 @@ module.exports = {
     GITHUB_ACTIONS: 'github-actions',
   },
 
-  //REPORT_REQUEST_STATE
+  // REPORT_REQUEST_STATE
   REPORT_REQUEST_STATE: {
     FIRST: 'FIRST',
     POLL: 'POLL',

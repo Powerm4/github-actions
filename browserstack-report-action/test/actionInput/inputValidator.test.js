@@ -1,5 +1,3 @@
-'use strict';
-
 const { expect } = require('chai');
 const sinon = require('sinon');
 const github = require('@actions/github');
@@ -137,11 +135,15 @@ describe('InputValidator', () => {
     });
 
     it('returns default for undefined', () => {
-      expect(InputValidator.validateUserTimeout(undefined)).to.equal(constants.DEFAULT_USER_TIMEOUT_SECONDS);
+      expect(
+        InputValidator.validateUserTimeout(undefined),
+      ).to.equal(constants.DEFAULT_USER_TIMEOUT_SECONDS);
     });
 
     it('returns default for null', () => {
-      expect(InputValidator.validateUserTimeout(null)).to.equal(constants.DEFAULT_USER_TIMEOUT_SECONDS);
+      expect(
+        InputValidator.validateUserTimeout(null),
+      ).to.equal(constants.DEFAULT_USER_TIMEOUT_SECONDS);
     });
 
     it('returns default for non-numeric string', () => {

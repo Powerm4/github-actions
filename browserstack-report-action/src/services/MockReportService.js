@@ -1,5 +1,3 @@
-'use strict';
-
 class MockReportService {
   constructor() {
     this.pollCount = 0;
@@ -26,48 +24,48 @@ class MockReportService {
       return this.customResponse;
     }
 
-    this.pollCount++;
+    this.pollCount += 1;
 
     // Simulate different scenarios based on poll count
     if (this.shouldFail) {
       return {
-        report_status: 'ERROR',
+        reportStatus: 'ERROR',
         report: {
-          basic_html: '<pre>Error: Mock API Error</pre>'
-        }
+          basicHtml: '<pre>Error: Mock API Error</pre>',
+        },
       };
     }
 
     if (this.pollCount === 1) {
       // First call returns configuration
       return {
-        report_status: 'IN_PROGRESS',
-        retry_count: 3,
-        polling_interval: 1, // 1 second for faster tests
-        build_uuid: 'mock-build-123',
+        reportStatus: 'IN_PROGRESS',
+        retryCount: 3,
+        pollingInterval: 1, // 1 second for faster tests
+        buildUuid: 'mock-build-123',
         report: {
-          basic_html: '<pre>Build found, generating report...</pre>'
-        }
+          basicHtml: '<pre>Build found, generating report...</pre>',
+        },
       };
     }
 
     if (this.pollCount < 3) {
       // Still processing
       return {
-        report_status: 'IN_PROGRESS',
-        build_uuid: 'mock-build-123',
+        reportStatus: 'IN_PROGRESS',
+        buildUuid: 'mock-build-123',
         report: {
-          basic_html: '<pre>Report generation in progress... Attempt ' + this.pollCount + '</pre>'
-        }
+          basicHtml: `<pre>Report generation in progress... Attempt ${this.pollCount}</pre>`,
+        },
       };
     }
 
     // Success after 3 polls
     return {
-      report_status: 'COMPLETED',
-      build_uuid: 'mock-build-123',
+      reportStatus: 'COMPLETED',
+      buildUuid: 'mock-build-123',
       report: {
-        basic_html: `
+        basicHtml: `
 <body>
 
   <h2>Build Insights</h2>
@@ -179,7 +177,7 @@ class MockReportService {
 
 </body>
         `,
-        rich_html: `<body>
+        richHtml: `<body>
 
     <h2>Build Insights</h2>
 
@@ -296,7 +294,7 @@ class MockReportService {
     </table>
 
 </body>`,
-        rich_css: `body {
+        richCss: `body {
             font-family: 'Arial', sans-serif;
             background-color: #f8f9fb;
             padding: 20px;
@@ -428,8 +426,8 @@ class MockReportService {
         .metric-box a {
             text-decoration: none;
             color: #007bff;
-        }`
-      }
+        }`,
+      },
     };
   }
 }

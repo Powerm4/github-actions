@@ -1,5 +1,3 @@
-'use strict';
-
 const core = require('@actions/core');
 const InputValidator = require('./inputValidator');
 const { INPUT } = require('../../config/constants');
