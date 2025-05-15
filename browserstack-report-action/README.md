@@ -5,20 +5,14 @@ The polling interval and maximum retries are determined by the initial API respo
 
 ## Inputs
 
--   `browserstack-username` (**required**): Your BrowserStack username.
+-   `username` (**required**): Your BrowserStack username.
     It's recommended to store this as a GitHub secret.
--   `browserstack-access-key` (**required**): Your BrowserStack access key.
+-   `access-key` (**required**): Your BrowserStack access key.
     It's recommended to store this as a GitHub secret.
 -   `build-name` (optional): The name of the build on BrowserStack.
     Defaults to `<GitHub Workflow Name>_<GitHub Run ID>`.
--   `user-timeout` (optional): User-defined timeout value (in seconds) to be sent to the report API.
-    Default: `300`. (Currently for dummy API simulation)
-
-## Outputs
-
--   `build_uuid`: The UUID of the build from the API.
--   `report_status`: The final status of the report generation.
--   `build_integration`: The type of build integration (e.g., "sdk", "non-sdk").
+-   `report-timeout` (optional): User-defined timeout value (in seconds) to be sent to the report API.
+    Default: `10`.
 
 ## Example Usage
 
@@ -42,12 +36,11 @@ jobs:
         # If using a local version from the same repository:
         uses: ./.github/actions/browserstack-report-action
         with:
-          browserstack-username: ${{ secrets.BROWSERSTACK_USERNAME }}
-          browserstack-access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          username: ${{ secrets.BROWSERSTACK_USERNAME }}
+          access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           build-name: 'My Awesome App E2E Tests'
-        # user-timeout can be specified if needed, e.g.:
-        #   user-timeout: '600'
-        # Polling interval and max retries are determined by the API's first response.
+        user-timeout can be specified if needed, e.g.:
+          user-timeout: '600'
 ```
 
 ## Development
