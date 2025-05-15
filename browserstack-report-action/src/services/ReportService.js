@@ -49,11 +49,12 @@ class ReportService {
       });
 
       const status = reportData.reportStatus;
-      if (status === 'COMPLETED' || status === 'TEST_AVAILABLE') {
+      if (status === constants.REPORT_STATUS.COMPLETED
+        || status === constants.REPORT_STATUS.TESTS_AVAILABLE) {
         return reportData;
       }
 
-      if (status === 'IN_PROGRESS' && retries < maxRetries) {
+      if (status === constants.REPORT_STATUS.IN_PROGRESS && retries < maxRetries) {
         await new Promise((resolve) => setTimeout(resolve, pollingInterval * 1000));
         return poll(retries + 1);
       }

@@ -28,12 +28,12 @@ module.exports = {
 
   // Report statuses
   REPORT_STATUS: {
-    IN_PROGRESS: 'in_progress',
-    COMPLETE: 'complete',
-    TESTS_AVAILABLE: 'tests_available',
-    NOT_AVAILABLE: 'not_available',
-    BUILD_NOT_FOUND: 'build_not_found',
-    MORE_THAN_ONE_BUILD_FOUND: 'more_than_one_build_found',
+    IN_PROGRESS: 'IN_PROGRESS',
+    COMPLETED: 'COMPLETED',
+    TESTS_AVAILABLE: 'TEST_AVAILABLE',
+    NOT_AVAILABLE: 'NOT_AVAILABLE',
+    BUILD_NOT_FOUND: 'BUILD_NOT_FOUND',
+    MULTIPLE_BUILD_FOUND: 'MULTIPLE_BUILD_FOUND',
   },
 
   // Integration types
@@ -38752,11 +38752,12 @@ class ReportService {
       });
 
       const status = reportData.reportStatus;
-      if (status === 'COMPLETED' || status === 'TEST_AVAILABLE') {
+      if (status === constants.REPORT_STATUS.COMPLETED
+        || status === constants.REPORT_STATUS.TESTS_AVAILABLE) {
         return reportData;
       }
 
-      if (status === 'IN_PROGRESS' && retries < maxRetries) {
+      if (status === constants.REPORT_STATUS.IN_PROGRESS && retries < maxRetries) {
         await new Promise((resolve) => setTimeout(resolve, pollingInterval * 1000));
         return poll(retries + 1);
       }

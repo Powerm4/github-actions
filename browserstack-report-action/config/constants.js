@@ -22,12 +22,12 @@ module.exports = {
 
   // Report statuses
   REPORT_STATUS: {
-    IN_PROGRESS: 'in_progress',
-    COMPLETE: 'complete',
-    TESTS_AVAILABLE: 'tests_available',
-    NOT_AVAILABLE: 'not_available',
-    BUILD_NOT_FOUND: 'build_not_found',
-    MORE_THAN_ONE_BUILD_FOUND: 'more_than_one_build_found',
+    IN_PROGRESS: 'IN_PROGRESS',
+    COMPLETED: 'COMPLETED',
+    TESTS_AVAILABLE: 'TEST_AVAILABLE',
+    NOT_AVAILABLE: 'NOT_AVAILABLE',
+    BUILD_NOT_FOUND: 'BUILD_NOT_FOUND',
+    MULTIPLE_BUILD_FOUND: 'MULTIPLE_BUILD_FOUND',
   },
 
   // Integration types
