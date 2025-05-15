@@ -10,7 +10,7 @@ class UploadFileForArtifact {
     }
 
     try {
-      const pathName = "browserstack-reports-atifact";
+      const pathName = "browserstack-reports-artifact";
       const fileName = `bstack-report.html`;
       const artifactName = "browserstack-report";
       // Create artifacts directory
