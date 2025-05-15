@@ -41965,7 +41965,7 @@ class ArtifactManager {
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
         ['report.html'],
-        process.cwd()+"/browserstack-artifacts",
+        "/browserstack-artifacts",
         { continueOnError: true }
       );
 
