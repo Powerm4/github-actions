@@ -1,6 +1,6 @@
 name: 'BrowserStack Report Action'
 description: 'Fetches a BrowserStack report and displays it in the GitHub Actions summary.'
-author: 'GitHub Copilot'
+author: 'BrowserStack'
 
 inputs:
   username:
