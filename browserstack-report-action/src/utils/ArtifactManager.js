@@ -24,6 +24,8 @@ class ArtifactManager {
       // Write content
       fs.writeFileSync(`browserstack-artifacts/${fileName}`, report);
       const fileStat = fs.statSync(filePath);
+      const content = fs.readFileSync(`browserstack-artifacts/${fileName}`, 'utf8');
+      core.info(`Successfully read file: ${filePath} (${content.length} bytes)`);
       core.exportVariable('BROWSERSTACK_REPORT_PATH', filePath);
       core.setOutput('fileStat', fileStat);
       core.setOutput('report_file_path', filePath);
