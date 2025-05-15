@@ -27,7 +27,7 @@ async function run() {
 
     const initialParams = {
       originalBuildName: buildName,
-      buildCreatedAt: new Date().toISOString(),
+      buildCreatedAt: Date.now().toString(), // Changed to timestamp string
       requestingCi: constants.CI_SYSTEM.GITHUB_ACTIONS,
       reportFormat: [constants.REPORT_FORMAT.BASIC_HTML, constants.REPORT_FORMAT.RICH_HTML],
       requestType: constants.REPORT_REQUEST_STATE.FIRST,
