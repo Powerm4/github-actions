@@ -39,8 +39,8 @@ jobs:
           username: ${{ secrets.BROWSERSTACK_USERNAME }}
           access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           build-name: 'My Awesome App E2E Tests'
-        user-timeout can be specified if needed, e.g.:
-          user-timeout: '600'
+        #user-timeout can be specified if needed, e.g.:
+          rser-timeout: '10'
 ```
 
 ## Development
