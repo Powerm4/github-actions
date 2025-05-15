@@ -38851,10 +38851,12 @@ class UploadFileForArtifact {
     try {
       const pathName = "browserstack-reports-atifact"
       const fileName = `bstack-report.html`;
+      const artifactName = "browserstack-report";
       // Create artifacts directory
       fs.mkdirSync(pathName, { recursive: true });
       //save path in a env variable
       core.exportVariable('BROWSERSTACK_REPORT_PATH', pathName);
+      core.exportVariable("BROWSERSTACK_REPORT_NAME", artifactName);
 
       // Write content
       fs.writeFileSync(path.join(pathName,fileName), report);
