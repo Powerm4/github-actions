@@ -41924,15 +41924,15 @@ class ArtifactManager {
 
     try {
       // Create artifacts directory
-      const artifactDir = path.join(process.env.GITHUB_WORKSPACE || '.', 'browserstack-artifacts');
-      fs.mkdirSync(artifactDir, { recursive: true });
+      const artifactDir = path.join(process.cwd(), 'browserstack-artifacts');
+      fs.mkdirSync("browserstack-artifacts", { recursive: true });
 
       // Create HTML file
       const fileName = `report.html`;
       const filePath = path.join(artifactDir, fileName);
 
       // Write content
-      fs.writeFileSync(filePath, report);
+      fs.writeFileSync(`browserstack-artifacts/${fileName}`, report);
       const fileStat = fs.statSync(filePath);
       core.exportVariable('BROWSERSTACK_REPORT_PATH', filePath);
       core.setOutput('fileStat', fileStat);
@@ -41959,12 +41959,12 @@ class ArtifactManager {
         return `File saved locally at: ${filePath}`;
       }
       const artifactName = `browserstack`;
-      const cwdPath = path.join(process.cwd(), 'browserstack-artifacts/reports.html');
-      fs.copyFileSync(filePath, cwdPath);
-      core.info(`Copied report to ${cwdPath}`);
+      // const cwdPath = path.join(process.cwd(), 'browserstack-artifacts/reports.html');
+      // fs.copyFileSync(filePath, cwdPath);
+      // core.info(`Copied report to ${cwdPath}`);
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
-        ['reports.html'],
+        ['report.html'],
         process.cwd()+"/browserstack-artifacts",
         { continueOnError: true }
       );
