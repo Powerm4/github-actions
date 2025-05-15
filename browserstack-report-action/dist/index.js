@@ -41964,8 +41964,8 @@ class ArtifactManager {
       // core.info(`Copied report to ${cwdPath}`);
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
-        ['report.html'],
-        "/browserstack-artifacts",
+        [`${artifactDir}/report.html`],
+        artifactDir,
         { continueOnError: true }
       );
 
