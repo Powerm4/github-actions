@@ -1,10 +1,10 @@
 'use strict';
 
 const core = require('@actions/core');
-const ArtifactManager = require('../utils/ArtifactManager');
+const UploadFileForArtifact = require('../utils/UploadFileForArtifact');
 
 class ReportProcessor {
-  static async processReport(reportData, buildName) {
+  static async processReport(reportData) {
     try {
       const summary = core.summary;
       await summary.addHeading('BrowserStack Test Report');
@@ -18,10 +18,10 @@ class ReportProcessor {
       summary.write();
       if(reportData?.report?.rich_html) {
         const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.rich_css}</style></head> ${reportData?.report?.rich_html}</html>`;
-        await ArtifactManager.saveReportAsArtifact(report, buildName);
+        await UploadFileForArtifact.saveReportInFile(report);
       }
     } catch (error) {
-      await core.info(`Error processing report: ${JSON.stringify(error)}`);
+      core.info(`Error processing report: ${JSON.stringify(error)}`);
       await core.summary
         .addRaw('❌ Error processing report')
         .write();

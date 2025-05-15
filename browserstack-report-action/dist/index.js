@@ -41299,7 +41299,7 @@ async function run() {
       pollingInterval
     );
 
-    await ReportProcessor.processReport(reportData, buildName);
+    await ReportProcessor.processReport(reportData);
   } catch (error) {
     core.setFailed(`Action failed: ${error.message}`);
   }
@@ -41766,10 +41766,10 @@ module.exports = new MockReportService(); // Export singleton instance
 
 
 const core = __nccwpck_require__(7484);
-const ArtifactManager = __nccwpck_require__(197);
+const UploadFileForArtifact = __nccwpck_require__(8751);
 
 class ReportProcessor {
-  static async processReport(reportData, buildName) {
+  static async processReport(reportData) {
     try {
       const summary = core.summary;
       await summary.addHeading('BrowserStack Test Report');
@@ -41783,10 +41783,10 @@ class ReportProcessor {
       summary.write();
       if(reportData?.report?.rich_html) {
         const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.rich_css}</style></head> ${reportData?.report?.rich_html}</html>`;
-        await ArtifactManager.saveReportAsArtifact(report, buildName);
+        await UploadFileForArtifact.saveReportInFile(report);
       }
     } catch (error) {
-      await core.info(`Error processing report: ${JSON.stringify(error)}`);
+      core.info(`Error processing report: ${JSON.stringify(error)}`);
       await core.summary
         .addRaw('❌ Error processing report')
         .write();
@@ -41904,89 +41904,6 @@ module.exports = ReportService;
 
 /***/ }),
 
-/***/ 197:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-const fs = __nccwpck_require__(9896);
-const path = __nccwpck_require__(6928);
-const core = __nccwpck_require__(7484);
-const artifact = __nccwpck_require__(7884);
-
-class ArtifactManager {
-  static async saveReportAsArtifact(report, buildName) {
-    if (!report) {
-      core.debug('No HTML content available to save as artifact');
-      return '';
-    }
-
-    try {
-      // Create artifacts directory
-      const artifactDir = path.join(process.cwd(), 'browserstack-artifacts');
-      fs.mkdirSync("browserstack-artifacts", { recursive: true });
-
-      // Create HTML file
-      const fileName = `report.html`;
-      const filePath = path.join(artifactDir, fileName);
-
-      // Write content
-      fs.writeFileSync(`browserstack-artifacts/${fileName}`, report);
-      const fileStat = fs.statSync(filePath);
-      const content = fs.readFileSync(`browserstack-artifacts/${fileName}`, 'utf8');
-      core.info(`Successfully read file: ${filePath} (${content.length} bytes)`);
-      core.exportVariable('BROWSERSTACK_REPORT_PATH', filePath);
-      core.setOutput('fileStat', fileStat);
-      core.setOutput('report_file_path', filePath);
-      core.setOutput('report_dir', artifactDir);
-
-      const dirContents = fs.readdirSync(artifactDir);
-      core.info(`Directory contents of ${artifactDir}: ${dirContents.join(', ')}`);
-      
-      // Upload as artifact 
-      let artifactClient;
-      if (typeof artifact.create === 'function') {
-        artifactClient = artifact.create();
-        core.info('Created artifact client using create() function');
-      } else if (typeof artifact.default === 'function') {
-        artifactClient = artifact.default();
-        core.info('Created artifact client using default() function');
-      } else if (typeof artifact === 'function') {
-        artifactClient = artifact();
-        core.info('Created artifact client using artifact as function');
-      } else {
-        // Just save the file locally and return
-        core.warning('Artifact API not available. Report saved locally only.');
-        return `File saved locally at: ${filePath}`;
-      }
-      const artifactName = `browserstack_results`;
-      const uploadResult = await artifactClient.uploadArtifact(
-        artifactName,
-        [filePath],
-        artifactDir,
-        { continueOnError: true }
-      );
-
-      if (uploadResult.failedItems.length > 0) {
-        core.warning(`Failed to upload artifacts: ${uploadResult.failedItems.join(', ')}`);
-        return '';
-      }
-
-      core.info(`Report saved as artifact: ${artifactName}`);
-      return `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/artifacts/${uploadResult.artifactId}`;
-    } catch (error) {
-      core.warning(`Failed to save artifact: ${error.message}`);
-      return '';
-    }
-  }
-}
-
-module.exports = ArtifactManager;
-
-
-/***/ }),
-
 /***/ 933:
 /***/ ((module) => {
 
@@ -42007,6 +41924,46 @@ class TimeoutManager {
 }
 
 module.exports = TimeoutManager;
+
+
+/***/ }),
+
+/***/ 8751:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const fs = __nccwpck_require__(9896);
+const path = __nccwpck_require__(6928);
+const core = __nccwpck_require__(7484);
+const artifact = __nccwpck_require__(7884);
+
+class UploadFileForArtifact {
+  static async saveReportAsArtifact(report) {
+    if (!report) {
+      core.debug('No HTML content available to save as artifact');
+      return '';
+    }
+
+    try {
+      const pathName = "browserstack-reports-atifact"
+      const fileName = `bstack-report.html`;
+      // Create artifacts directory
+      fs.mkdirSync(pathName, { recursive: true });
+      //save path in a env variable
+      core.exportVariable('BROWSERSTACK_REPORT_PATH', pathName);
+
+      // Write content
+      fs.writeFileSync(path.join(pathName,fileName), report);
+    } catch (error) {
+      core.warning(`Failed to save file: ${error.message}`);
+      return '';
+    }
+  }
+}
+
+module.exports = UploadFileForArtifact;
 
 
 /***/ }),
