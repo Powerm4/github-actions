@@ -41960,7 +41960,7 @@ class ArtifactManager {
         core.warning('Artifact API not available. Report saved locally only.');
         return `File saved locally at: ${filePath}`;
       }
-      const artifactName = `browserstack`;
+      const artifactName = `browserstack_results`;
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
         [filePath],
