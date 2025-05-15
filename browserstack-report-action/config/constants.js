@@ -9,8 +9,8 @@ module.exports = {
 
   // Report formats
   REPORT_FORMAT: {
-    BASIC_HTML: 'basic_html',
-    RICH_HTML: 'rich_html',
+    BASIC_HTML: 'basicHtml',
+    RICH_HTML: 'richHtml',
   },
 
   INPUT: {
