@@ -3,10 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 const core = require('@actions/core');
-const artifact = require('@actions/artifact');
 
 class UploadFileForArtifact {
-  static async saveReportAsArtifact(report) {
+  static async saveReportInFile(report) {
     if (!report) {
       core.debug('No HTML content available to save as artifact');
       return '';
