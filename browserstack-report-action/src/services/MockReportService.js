@@ -209,7 +209,7 @@ class MockReportService {
     <div class="grid-metrics">
         <div class="metric-box">
             <h2>New Failures</h2>
-            <h4><a href="<https://observability.browserstack.com/projects/WDIO+Cucumber+GH/builds/Sanity+Only+Chrome/4052?tab=insights>" target="_blank">View</a></h4>
+            <h4><a href="https://observability.browserstack.com/projects/WDIO+Cucumber+GH/builds/Sanity+Only+Chrome/4052?tab=insights" target="_blank">View</a></h4>
         </div>
         <div class="metric-box">
             <h2>Always Failing</h2>
