@@ -41964,7 +41964,7 @@ class ArtifactManager {
       // core.info(`Copied report to ${cwdPath}`);
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
-        [`${artifactDir}/report.html`],
+        [`report.html`],
         artifactDir,
         { continueOnError: true }
       );
