@@ -41959,13 +41959,13 @@ class ArtifactManager {
         return `File saved locally at: ${filePath}`;
       }
       const artifactName = `browserstack`;
-      const cwdPath = path.join(process.cwd(), 'report.html');
+      const cwdPath = path.join(process.cwd(), 'browserstack-artifact/report.html');
       fs.copyFileSync(filePath, cwdPath);
       core.info(`Copied report to ${cwdPath}`);
       const uploadResult = await artifactClient.uploadArtifact(
         artifactName,
         [fileName],
-        process.cwd(),
+        process.cwd()+"/browserstack-artifact",
         { continueOnError: true }
       );
 
