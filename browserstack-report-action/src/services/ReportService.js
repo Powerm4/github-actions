@@ -69,9 +69,6 @@ class ReportService {
 
   static handleErrorStatus(status, reportData) {
     const errorMessages = {
-      BUILD_NOT_FOUND: 'Build not found in BrowserStack',
-      MULTIPLE_BUILD_FOUND: 'Multiple builds found with the same name',
-      DATA_NOT_AVAILABLE: 'Report data not available from BrowserStack',
       ERROR: 'Error occurred while fetching report',
     };
 
