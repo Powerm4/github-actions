@@ -38186,8 +38186,8 @@ async function run() {
     };
 
     timeoutManager.check();
-    const initialReport = await reportService.fetchReport(initialParams);
-    let { retryCount: maxRetries, pollingInterval } = initialReport;
+    let reportData = await reportService.fetchReport(initialParams);
+    let { retryCount: maxRetries, pollingInterval } = reportData;
 
     if (!pollingInterval) {
       pollingInterval = constants.DEFAULT_POLLING_INTERVAL_SECONDS;
@@ -38197,12 +38197,14 @@ async function run() {
       maxRetries = constants.DEFAULT_MAX_RETRIES;
     }
 
-    const reportData = await reportService.pollReport(
-      initialParams,
-      timeoutManager,
-      maxRetries,
-      pollingInterval,
-    );
+    if (reportData.reportStatus === constants.REPORT_STATUS.IN_PROGRESS) {
+      reportData = await reportService.pollReport(
+        initialParams,
+        timeoutManager,
+        maxRetries,
+        pollingInterval,
+      );
+    }
 
     await ReportProcessor.processReport(reportData);
   } catch (error) {
