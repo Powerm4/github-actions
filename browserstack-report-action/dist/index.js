@@ -38753,7 +38753,8 @@ class ReportService {
 
       const status = reportData.reportStatus;
       if (status === constants.REPORT_STATUS.COMPLETED
-        || status === constants.REPORT_STATUS.TESTS_AVAILABLE) {
+        || status === constants.REPORT_STATUS.TEST_AVAILABLE
+        || status === constants.REPORT_STATUS.NOT_AVAILABLE) {
         return reportData;
       }
 
