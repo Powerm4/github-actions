@@ -38,9 +38,11 @@ class ReportService {
     };
   }
 
-  async pollReport(params, timeoutManager, maxRetries, pollingInterval) {
+  async pollReport(params, timeManager, maxRetries, pollingInterval) {
     const poll = async (retries) => {
-      timeoutManager.check();
+      if (timeManager.checkTimeout()) {
+        return this.handleErrorStatus(constants.REPORT_STATUS.IN_PROGRESS);
+      }
 
       const reportData = await this.fetchReport({
         ...params,
@@ -56,7 +58,7 @@ class ReportService {
       }
 
       if (status === constants.REPORT_STATUS.IN_PROGRESS && retries < maxRetries) {
-        await new Promise((resolve) => setTimeout(resolve, pollingInterval * 1000));
+        await timeManager.sleep(pollingInterval);
         return poll(retries + 1);
       }
 
@@ -67,15 +69,16 @@ class ReportService {
     return poll(0);
   }
 
-  static handleErrorStatus(status, reportData) {
+  static handleErrorStatus(status, reportData = {}) {
     const errorMessages = {
-      ERROR: 'Error occurred while fetching report',
+      ERROR: 'Unable to Fetch Report',
+      IN_PROGRESS: 'Report is still in progress',
     };
 
     return {
       errorMessage: errorMessages[status] || `Unexpected status: ${status}`,
       reportStatus: status,
-      report: reportData.report,
+      report: status === constants.REPORT_STATUS.IN_PROGRESS ? { basicHtml: '<pre>Report generation not completed, please try again after increasing report timeout</pre>' } : reportData.report,
     };
   }
 }

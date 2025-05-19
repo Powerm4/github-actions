@@ -15,7 +15,8 @@ class ReportProcessor {
       summary.write();
       if (reportData?.report?.richHtml) {
         const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.richCss}</style></head> ${reportData?.report?.richHtml}</html>`;
-        await UploadFileForArtifact.saveReportInFile(report);
+        const artifactObj = new UploadFileForArtifact(report);
+        await artifactObj.saveReportInFile();
       }
     } catch (error) {
       core.info(`Error processing report: ${JSON.stringify(error)}`);

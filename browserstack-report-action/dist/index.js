@@ -38154,7 +38154,7 @@ const constants = __nccwpck_require__(9350);
 const ActionInput = __nccwpck_require__(460);
 const ReportService = __nccwpck_require__(9427);
 const ReportProcessor = __nccwpck_require__(4140);
-const TimeoutManager = __nccwpck_require__(933);
+const TimeManager = __nccwpck_require__(9991);
 
 async function run() {
   try {
@@ -38172,7 +38172,7 @@ async function run() {
       core.info('Running in test mode with mock API responses');
     }
 
-    const timeoutManager = new TimeoutManager(userTimeout
+    const timeManager = new TimeManager(userTimeout
       || constants.DEFAULT_USER_TIMEOUT_SECONDS);
     const reportService = new ReportService(authHeader, isTestMode);
 
@@ -38185,7 +38185,7 @@ async function run() {
       userTimeout,
     };
 
-    timeoutManager.check();
+    timeManager.checkTimeout();
     let reportData = await reportService.fetchReport(initialParams);
     let { retryCount: maxRetries, pollingInterval } = reportData;
 
@@ -38200,7 +38200,7 @@ async function run() {
     if (reportData.reportStatus === constants.REPORT_STATUS.IN_PROGRESS) {
       reportData = await reportService.pollReport(
         initialParams,
-        timeoutManager,
+        timeManager,
         maxRetries,
         pollingInterval,
       );
@@ -38683,7 +38683,8 @@ class ReportProcessor {
       summary.write();
       if (reportData?.report?.richHtml) {
         const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.richCss}</style></head> ${reportData?.report?.richHtml}</html>`;
-        await UploadFileForArtifact.saveReportInFile(report);
+        const artifactObj = new UploadFileForArtifact(report);
+        await artifactObj.saveReportInFile();
       }
     } catch (error) {
       core.info(`Error processing report: ${JSON.stringify(error)}`);
@@ -38743,9 +38744,11 @@ class ReportService {
     };
   }
 
-  async pollReport(params, timeoutManager, maxRetries, pollingInterval) {
+  async pollReport(params, timeManager, maxRetries, pollingInterval) {
     const poll = async (retries) => {
-      timeoutManager.check();
+      if (timeManager.checkTimeout()) {
+        return this.handleErrorStatus(constants.REPORT_STATUS.IN_PROGRESS);
+      }
 
       const reportData = await this.fetchReport({
         ...params,
@@ -38761,7 +38764,7 @@ class ReportService {
       }
 
       if (status === constants.REPORT_STATUS.IN_PROGRESS && retries < maxRetries) {
-        await new Promise((resolve) => setTimeout(resolve, pollingInterval * 1000));
+        await timeManager.sleep(pollingInterval);
         return poll(retries + 1);
       }
 
@@ -38772,15 +38775,16 @@ class ReportService {
     return poll(0);
   }
 
-  static handleErrorStatus(status, reportData) {
+  static handleErrorStatus(status, reportData = {}) {
     const errorMessages = {
-      ERROR: 'Error occurred while fetching report',
+      ERROR: 'Unable to Fetch Report',
+      IN_PROGRESS: 'Report is still in progress',
     };
 
     return {
       errorMessage: errorMessages[status] || `Unexpected status: ${status}`,
       reportStatus: status,
-      report: reportData.report,
+      report: status === constants.REPORT_STATUS.IN_PROGRESS ? { basicHtml: '<pre>Report generation not completed, please try again after increasing report timeout</pre>' } : reportData.report,
     };
   }
 }
@@ -38790,23 +38794,32 @@ module.exports = ReportService;
 
 /***/ }),
 
-/***/ 933:
+/***/ 9991:
 /***/ ((module) => {
 
-class TimeoutManager {
+class TimeManager {
   constructor(timeoutSeconds) {
     this.timeoutMs = timeoutSeconds * 1000;
     this.startTime = Date.now();
   }
 
-  check() {
+  checkTimeout() {
     if (Date.now() - this.startTime >= this.timeoutMs) {
       throw new Error(`Operation timed out after ${this.timeoutMs / 1000} seconds`);
     }
   }
+
+  /**
+   * Sleep for specified seconds
+   * @param {number} seconds - Number of seconds to sleep
+   * @returns {Promise} - Promise that resolves after the specified time
+   */
+  static async sleep(seconds) {
+    return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+  }
 }
 
-module.exports = TimeoutManager;
+module.exports = TimeManager;
 
 
 /***/ }),
@@ -38819,6 +38832,10 @@ const path = __nccwpck_require__(6928);
 const core = __nccwpck_require__(7484);
 
 class UploadFileForArtifact {
+  constructor(report) {
+    this.report = report;
+  }
+
   static async saveReportInFile(report) {
     if (!report) {
       core.debug('No HTML content available to save as artifact');

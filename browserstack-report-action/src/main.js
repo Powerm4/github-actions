@@ -3,7 +3,7 @@ const constants = require('../config/constants');
 const ActionInput = require('./actionInput');
 const ReportService = require('./services/ReportService');
 const ReportProcessor = require('./services/ReportProcessor');
-const TimeoutManager = require('./utils/TimeoutManager');
+const TimeManager = require('./utils/TimeManager');
 
 async function run() {
   try {
@@ -21,7 +21,7 @@ async function run() {
       core.info('Running in test mode with mock API responses');
     }
 
-    const timeoutManager = new TimeoutManager(userTimeout
+    const timeManager = new TimeManager(userTimeout
       || constants.DEFAULT_USER_TIMEOUT_SECONDS);
     const reportService = new ReportService(authHeader, isTestMode);
 
@@ -34,7 +34,7 @@ async function run() {
       userTimeout,
     };
 
-    timeoutManager.check();
+    timeManager.checkTimeout();
     let reportData = await reportService.fetchReport(initialParams);
     let { retryCount: maxRetries, pollingInterval } = reportData;
 
@@ -49,7 +49,7 @@ async function run() {
     if (reportData.reportStatus === constants.REPORT_STATUS.IN_PROGRESS) {
       reportData = await reportService.pollReport(
         initialParams,
-        timeoutManager,
+        timeManager,
         maxRetries,
         pollingInterval,
       );
