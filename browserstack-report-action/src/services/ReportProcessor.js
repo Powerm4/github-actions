@@ -11,15 +11,18 @@ class ReportProcessor {
       const { summary } = core;
       await summary.addHeading('BrowserStack Test Report');
 
-      if (this.reportData?.report?.basicHtml) {
-        await summary.addRaw(`<html>${this.reportData.report.basicHtml}</html>`);
+      const addToSummaryReport = this.reportData?.report?.basicHtml;
+      if (addToSummaryReport) {
+        await summary.addRaw(`<html>${addToSummaryReport}</html>`);
       } else {
         await summary.addRaw('⚠️ No report content available');
       }
       summary.write();
-      if (this.reportData?.report?.richHtml) {
-        const report = `<!DOCTYPE html> <html><head><style>${this.reportData?.report?.richCss}</style></head> ${this.reportData?.report?.richHtml}</html>`;
-        const artifactObj = new UploadFileForArtifact(report);
+      const addToArtifactReport = this.reportData?.report?.richHtml;
+      const addToArtifactReportCss = this.reportData?.report?.richCss;
+      if (addToArtifactReport) {
+        const report = `<!DOCTYPE html> <html><head><style>${addToArtifactReportCss}</style></head> ${addToArtifactReport}}</html>`;
+        const artifactObj = new UploadFileForArtifact(report, 'browserstack-artifacts', 'browserstack-report.html', 'BrowserStack Test Report');
         await artifactObj.saveReportInFile();
       }
     } catch (error) {

@@ -38681,15 +38681,18 @@ class ReportProcessor {
       const { summary } = core;
       await summary.addHeading('BrowserStack Test Report');
 
-      if (this.reportData?.report?.basicHtml) {
-        await summary.addRaw(`<html>${this.reportData.report.basicHtml}</html>`);
+      const addToSummaryReport = this.reportData?.report?.basicHtml;
+      if (addToSummaryReport) {
+        await summary.addRaw(`<html>${addToSummaryReport}</html>`);
       } else {
         await summary.addRaw('⚠️ No report content available');
       }
       summary.write();
-      if (this.reportData?.report?.richHtml) {
-        const report = `<!DOCTYPE html> <html><head><style>${this.reportData?.report?.richCss}</style></head> ${this.reportData?.report?.richHtml}</html>`;
-        const artifactObj = new UploadFileForArtifact(report);
+      const addToArtifactReport = this.reportData?.report?.richHtml;
+      const addToArtifactReportCss = this.reportData?.report?.richCss;
+      if (addToArtifactReport) {
+        const report = `<!DOCTYPE html> <html><head><style>${addToArtifactReportCss}</style></head> ${addToArtifactReport}}</html>`;
+        const artifactObj = new UploadFileForArtifact(report, 'browserstack-artifacts', 'browserstack-report.html', 'BrowserStack Test Report');
         await artifactObj.saveReportInFile();
       }
     } catch (error) {
@@ -38844,8 +38847,11 @@ const path = __nccwpck_require__(6928);
 const core = __nccwpck_require__(7484);
 
 class UploadFileForArtifact {
-  constructor(report) {
+  constructor(report, pathName, fileName, artifactName) {
     this.report = report;
+    this.pathName = pathName;
+    this.fileName = fileName;
+    this.artifactName = artifactName;
   }
 
   async saveReportInFile() {
@@ -38855,17 +38861,14 @@ class UploadFileForArtifact {
     }
 
     try {
-      const pathName = "browserstack-reports-artifact";
-      const fileName = `bstack-report.html`;
-      const artifactName = "browserstack-report";
       // Create artifacts directory
-      fs.mkdirSync(pathName, { recursive: true });
+      fs.mkdirSync(this.pathName, { recursive: true });
       // save path in a env variable
-      core.exportVariable('BROWSERSTACK_REPORT_PATH', pathName);
-      core.exportVariable("BROWSERSTACK_REPORT_NAME", artifactName);
+      core.exportVariable('BROWSERSTACK_REPORT_PATH', this.pathName);
+      core.exportVariable("BROWSERSTACK_REPORT_NAME", this.artifactName);
 
       // Write content
-      fs.writeFileSync(path.join(pathName, fileName), this.report);
+      fs.writeFileSync(path.join(this.pathName, this.fileName), this.report);
     } catch (error) {
       core.warning(`Failed to save file: ${error.message}`);
       return '';
