@@ -7,8 +7,8 @@ class UploadFileForArtifact {
     this.report = report;
   }
 
-  static async saveReportInFile(report) {
-    if (!report) {
+  async saveReportInFile() {
+    if (!this.report) {
       core.debug('No HTML content available to save as artifact');
       return '';
     }
@@ -24,7 +24,7 @@ class UploadFileForArtifact {
       core.exportVariable("BROWSERSTACK_REPORT_NAME", artifactName);
 
       // Write content
-      fs.writeFileSync(path.join(pathName, fileName), report);
+      fs.writeFileSync(path.join(pathName, fileName), this.report);
     } catch (error) {
       core.warning(`Failed to save file: ${error.message}`);
       return '';
