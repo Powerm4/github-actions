@@ -55,7 +55,9 @@ async function run() {
       );
     }
 
-    await ReportProcessor.processReport(reportData);
+    const reportProcessor = new ReportProcessor(reportData);
+    await reportProcessor.processReport();
+    core.info('Report processing completed successfully');
   } catch (error) {
     core.setFailed(`Action failed: ${error.message}`);
   }

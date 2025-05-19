@@ -2,19 +2,23 @@ const core = require('@actions/core');
 const UploadFileForArtifact = require('../utils/UploadFileForArtifact');
 
 class ReportProcessor {
-  static async processReport(reportData) {
+  constructor(reportData) {
+    this.reportData = reportData;
+  }
+
+  async processReport() {
     try {
       const { summary } = core;
       await summary.addHeading('BrowserStack Test Report');
 
-      if (reportData?.report?.basicHtml) {
-        await summary.addRaw(`<html>${reportData.report.basicHtml}</html>`);
+      if (this.reportData?.report?.basicHtml) {
+        await summary.addRaw(`<html>${this.reportData.report.basicHtml}</html>`);
       } else {
         await summary.addRaw('⚠️ No report content available');
       }
       summary.write();
-      if (reportData?.report?.richHtml) {
-        const report = `<!DOCTYPE html> <html><head><style>${reportData?.report?.richCss}</style></head> ${reportData?.report?.richHtml}</html>`;
+      if (this.reportData?.report?.richHtml) {
+        const report = `<!DOCTYPE html> <html><head><style>${this.reportData?.report?.richCss}</style></head> ${this.reportData?.report?.richHtml}</html>`;
         const artifactObj = new UploadFileForArtifact(report);
         await artifactObj.saveReportInFile();
       }
