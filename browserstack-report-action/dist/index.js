@@ -38296,8 +38296,7 @@ class MockReportService {
         basicHtml: `
 <body>
 
-  <h2>Build Insights</h2>
-
+  <h2>Build Insights</h2> 
   <table border="1">
     <tr>
       <th align="center">All</th>
