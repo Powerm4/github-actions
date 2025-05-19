@@ -68,11 +68,10 @@ class MockReportService {
         basicHtml: `
 <body>
 
-  <h2>Build Insights</h2>
-
-  <table border="1">
+  <h2>Build Insights</h2> \n
+  <table border="1">\n
     <tr>
-      <th align="center">All</th>
+      <th align=\"center\">All</th>
       <th align="center">Passed</th>
       <th align="center">Failed</th>
       <th align="center">Skipped</th>
