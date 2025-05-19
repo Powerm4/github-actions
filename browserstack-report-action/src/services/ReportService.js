@@ -39,6 +39,7 @@ class ReportService {
   }
 
   async pollReport(params, timeManager, maxRetries, pollingInterval) {
+    timeManager.setPollingInterval(pollingInterval);
     const poll = async (retries) => {
       if (timeManager.checkTimeout()) {
         return this.handleErrorStatus(constants.REPORT_STATUS.IN_PROGRESS);
@@ -58,7 +59,7 @@ class ReportService {
       }
 
       if (status === constants.REPORT_STATUS.IN_PROGRESS && retries < maxRetries) {
-        await timeManager.sleep(pollingInterval);
+        await timeManager.sleep();
         return poll(retries + 1);
       }
 

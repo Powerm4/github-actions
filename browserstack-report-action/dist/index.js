@@ -38745,6 +38745,7 @@ class ReportService {
   }
 
   async pollReport(params, timeManager, maxRetries, pollingInterval) {
+    timeManager.setPollingInterval(pollingInterval);
     const poll = async (retries) => {
       if (timeManager.checkTimeout()) {
         return this.handleErrorStatus(constants.REPORT_STATUS.IN_PROGRESS);
@@ -38764,7 +38765,7 @@ class ReportService {
       }
 
       if (status === constants.REPORT_STATUS.IN_PROGRESS && retries < maxRetries) {
-        await timeManager.sleep(pollingInterval);
+        await timeManager.sleep();
         return poll(retries + 1);
       }
 
@@ -38810,13 +38811,16 @@ class TimeManager {
     return false;
   }
 
+  setPollingInterval(seconds) {
+    this.pollingInterval = seconds;
+  }
+
   /**
    * Sleep for specified seconds
    * @param {number} seconds - Number of seconds to sleep
    * @returns {Promise} - Promise that resolves after the specified time
    */
-  async sleep(seconds) {
-    this.pollingInterval = seconds;
+  async sleep() {
     return new Promise((resolve) => setTimeout(resolve, this.pollingInterval * 1000));
   }
 }
