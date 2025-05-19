@@ -6,8 +6,9 @@ class TimeManager {
 
   checkTimeout() {
     if (Date.now() - this.startTime >= this.timeoutMs) {
-      throw new Error(`Operation timed out after ${this.timeoutMs / 1000} seconds`);
+      return true;
     }
+    return false;
   }
 
   /**
@@ -15,8 +16,9 @@ class TimeManager {
    * @param {number} seconds - Number of seconds to sleep
    * @returns {Promise} - Promise that resolves after the specified time
    */
-  static async sleep(seconds) {
-    return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+  async sleep(seconds) {
+    this.pollingInterval = seconds;
+    return new Promise((resolve) => setTimeout(resolve, this.pollingInterval * 1000));
   }
 }
 
