@@ -15,15 +15,9 @@ async function run() {
     } = actionInput.getInputs();
     const authHeader = `Basic ${Buffer.from(`${username}:${accessKey}`).toString('base64')}`;
 
-    // Enable test mode if environment variable is set
-    const isTestMode = 'true';
-    if (isTestMode) {
-      core.info('Running in test mode with mock API responses');
-    }
-
     const timeManager = new TimeManager(userTimeout
       || constants.DEFAULT_USER_TIMEOUT_SECONDS);
-    const reportService = new ReportService(authHeader, isTestMode);
+    const reportService = new ReportService(authHeader);
 
     const initialParams = {
       originalBuildName: buildName,

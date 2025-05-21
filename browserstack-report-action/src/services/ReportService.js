@@ -21,7 +21,7 @@ class ReportService {
       return response.data;
     } catch (error) {
       core.info(`Error fetching report: ${error.message}`);
-      return this.errorResponse();
+      return this.errorResponse(error.message);
     }
   }
 
