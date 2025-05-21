@@ -38283,12 +38283,12 @@ class ReportService {
         },
       });
       if (response.status < 200 || response.status > 299) {
-        return this.errorResponse(response?.data?.errorMessage || "Something Went Wrong while Fetching report");
+        return ReportService.errorResponse(response?.data?.errorMessage || "Something Went Wrong while Fetching report");
       }
       return response.data;
     } catch (error) {
       core.info(`Error fetching report: ${error.message}`);
-      return this.errorResponse(error.message);
+      return ReportService.errorResponse(error.message);
     }
   }
 
@@ -38303,7 +38303,7 @@ class ReportService {
     timeManager.setPollingInterval(pollingInterval);
     const poll = async (retries) => {
       if (timeManager.checkTimeout()) {
-        return this.handleErrorStatus(constants.REPORT_STATUS.IN_PROGRESS);
+        return ReportService.handleErrorStatus(constants.REPORT_STATUS.IN_PROGRESS);
       }
 
       const reportData = await this.fetchReport({
