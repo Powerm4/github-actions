@@ -1,20 +1,14 @@
 const axios = require('axios');
 const core = require('@actions/core');
 const constants = require('../../config/constants');
-const mockService = require('./MockReportService');
 
 class ReportService {
-  constructor(authHeader, isTestMode = false) {
+  constructor(authHeader) {
     this.authHeader = authHeader;
-    this.apiUrl = 'https://api-observability.browserstack.com/api/v1/builds/buildReport';
-    this.isTestMode = isTestMode;
+    this.apiUrl = 'https://api-observability.browserstack.com/ext/v1/builds/buildReport';
   }
 
   async fetchReport(params) {
-    if (this.isTestMode) {
-      return mockService.getMockResponse();
-    }
-
     try {
       const response = await axios.post(this.apiUrl, params, {
         headers: {
