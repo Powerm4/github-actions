@@ -11,9 +11,10 @@ class ReportProcessor {
       const { summary } = core;
       await summary.addHeading('BrowserStack Test Report');
 
-      const addToSummaryReport = this.reportData?.report?.basicHtml;
+      let addToSummaryReport = this.reportData?.report?.basicHtml;
       if (addToSummaryReport) {
-        await summary.addRaw(`<html>${addToSummaryReport}</html>`);
+        addToSummaryReport = `<html> ${addToSummaryReport} </html>`;
+        await summary.addRaw(addToSummaryReport);
       } else {
         await summary.addRaw('⚠️ No report content available');
       }
