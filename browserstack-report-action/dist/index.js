@@ -38283,7 +38283,7 @@ class ReportService {
           Authorization: this.authHeader,
         },
       });
-      core.debug(`params fetched successfully: ${params}}`);
+      core.info(`params fetched successfully: ${params}}`);
       if (response.status < 200 || response.status > 299) {
         core.info(`Error fetching report: ${response.status}`);
         return ReportService.errorResponse(response?.data?.errorMessage || "Something Went Wrong while Fetching report");
