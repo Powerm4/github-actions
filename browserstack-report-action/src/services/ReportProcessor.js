@@ -15,7 +15,7 @@ class ReportProcessor {
       if (addToSummaryReport) {
         addToSummaryReport = `<html> ${addToSummaryReport} </html>`;
         core.info(`Report HTML: ${addToSummaryReport}`);
-        await summary.addRaw(addToSummaryReport, true);
+        await summary.addRaw(addToSummaryReport, false);
       } else {
         await summary.addRaw('⚠️ No report content available', true);
       }
