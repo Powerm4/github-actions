@@ -25,7 +25,7 @@ async function run() {
       requestingCi: constants.CI_SYSTEM.GITHUB_ACTIONS,
       reportFormat: [constants.REPORT_FORMAT.BASIC_HTML, constants.REPORT_FORMAT.RICH_HTML],
       requestType: constants.REPORT_REQUEST_STATE.FIRST,
-      userTimeout,
+      // userTimeout,
     };
 
     timeManager.checkTimeout();
