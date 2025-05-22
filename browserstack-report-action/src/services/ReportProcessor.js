@@ -23,7 +23,7 @@ class ReportProcessor {
       const addToArtifactReport = this.reportData?.report?.richHtml;
       const addToArtifactReportCss = this.reportData?.report?.richCss;
       if (addToArtifactReport) {
-        const report = `<!DOCTYPE html> <html><head><style>${addToArtifactReportCss}</style></head> ${addToArtifactReport}}</html>`;
+        const report = `<!DOCTYPE html> <html><head><style>${addToArtifactReportCss}</style></head> ${addToArtifactReport}</html>`;
         const artifactObj = new UploadFileForArtifact(report, 'browserstack-artifacts', 'browserstack-report.html', 'BrowserStack Test Report');
         await artifactObj.saveReportInFile();
       }
