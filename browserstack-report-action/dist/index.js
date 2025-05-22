@@ -38236,9 +38236,9 @@ class ReportProcessor {
       if (addToSummaryReport) {
         addToSummaryReport = `<html> ${addToSummaryReport} </html>`;
         core.info(`Report HTML: ${addToSummaryReport}`);
-        await summary.addRaw(addToSummaryReport);
+        await summary.addRaw(addToSummaryReport, true);
       } else {
-        await summary.addRaw('⚠️ No report content available');
+        await summary.addRaw('⚠️ No report content available', true);
       }
       summary.write();
       const addToArtifactReport = this.reportData?.report?.richHtml;
@@ -38251,7 +38251,7 @@ class ReportProcessor {
     } catch (error) {
       core.info(`Error processing report: ${JSON.stringify(error)}`);
       await core.summary
-        .addRaw('❌ Error processing report')
+        .addRaw('❌ Error processing report', true)
         .write();
       throw error;
     }
