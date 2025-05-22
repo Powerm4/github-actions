@@ -38235,6 +38235,7 @@ class ReportProcessor {
       let addToSummaryReport = this.reportData?.report?.basicHtml;
       if (addToSummaryReport) {
         addToSummaryReport = `<html> ${addToSummaryReport} </html>`;
+        addToSummaryReport = JSON.stringify(addToSummaryReport);
         core.info(`Report HTML: ${addToSummaryReport}`);
         await summary.addRaw(addToSummaryReport, false);
       } else {
