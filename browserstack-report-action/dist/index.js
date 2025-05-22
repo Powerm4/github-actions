@@ -38232,9 +38232,9 @@ class ReportProcessor {
       const { summary } = core;
       await summary.addHeading('BrowserStack Test Report');
 
-      const addToSummaryReport = `${this.reportData?.report?.basicHtml}`;
+      let addToSummaryReport = this.reportData?.report?.basicHtml;
       if (addToSummaryReport) {
-        // addToSummaryReport = `<html>${addToSummaryReport}</html>`;
+        addToSummaryReport = `<html>${addToSummaryReport}</html>`;
         core.info(`Report HTML: ${addToSummaryReport}`);
         await summary.addRaw(addToSummaryReport, false);
       } else {
