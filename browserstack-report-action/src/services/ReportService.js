@@ -16,18 +16,19 @@ class ReportService {
         },
       });
       if (response.status < 200 || response.status > 299) {
+        core.info(`Error fetching report: ${response.status}`);
         return ReportService.errorResponse(response?.data?.errorMessage || "Something Went Wrong while Fetching report");
       }
       return response.data;
     } catch (error) {
       core.info(`Error fetching report: ${error.message}`);
-      return ReportService.errorResponse(error.message);
+      return ReportService.errorResponse("Something Went Wrong while Fetching report");
     }
   }
 
   static errorResponse(errorMessage) {
     return {
-      report: { basicHtml: `<pre>${errorMessage || "Something Went Wrong while Fetching report"}</pre>` },
+      report: { basicHtml: `<pre>${errorMessage}</pre>` },
       reportStatus: 'ERROR',
     };
   }
