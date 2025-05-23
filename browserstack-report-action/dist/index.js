@@ -38235,6 +38235,7 @@ class ReportProcessor {
       let addToSummaryReport = this.reportData?.report?.basicHtml;
       if (addToSummaryReport) {
         addToSummaryReport = `<html>${addToSummaryReport}</html>`;
+        addToSummaryReport = addToSummaryReport.replace(/[\u201C\u201D]/g, '"');
         core.info(`Report HTML: ${addToSummaryReport}`);
         await summary.addRaw(addToSummaryReport, false);
       } else {
