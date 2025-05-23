@@ -38235,9 +38235,8 @@ class ReportProcessor {
       let addToSummaryReport = this.reportData?.report?.basicHtml;
       if (addToSummaryReport) {
         addToSummaryReport = `<html>${addToSummaryReport}</html>`;
-        addToSummaryReport = addToSummaryReport.replace(/[\u201C\u201D]/g, '"');
-        addToSummaryReport = addToSummaryReport.replace(/"(target="_blank")/g, '" $1');
-        addToSummaryReport = addToSummaryReport.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        addToSummaryReport = addToSummaryReport.replace(/[\u201C\u201D]/g, '"'); // Replace smart quotes with regular quotes
+        addToSummaryReport = addToSummaryReport.replace(/<\/?tbody>/gi, ''); // Remove tbody tags
         core.info(`Report HTML: ${addToSummaryReport}`);
         await summary.addRaw(addToSummaryReport, false);
       } else {
