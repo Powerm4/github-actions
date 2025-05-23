@@ -38237,7 +38237,6 @@ class ReportProcessor {
         addToSummaryReport = `<html>${addToSummaryReport}</html>`;
         addToSummaryReport = addToSummaryReport.replace(/[\u201C\u201D]/g, '"'); // Replace smart quotes with regular quotes
         addToSummaryReport = addToSummaryReport.replace(/<\/?tbody>/gi, ''); // Remove tbody tags
-        core.info(`Report HTML: ${addToSummaryReport}`);
         await summary.addRaw(addToSummaryReport, false);
       } else {
         await summary.addRaw('⚠️ No report content available', true);
@@ -38286,11 +38285,12 @@ class ReportService {
           Authorization: this.authHeader,
         },
       });
-      core.info(`Response from report API: ${JSON.stringify(response.data)}`);
+
       if (response.status < 200 || response.status > 299) {
         core.info(`Error fetching report: ${response.status}`);
         return ReportService.errorResponse(response?.data?.errorMessage || "Something Went Wrong while Fetching report");
       }
+      core.info(`Response from report API: ${response?.data?.reportStatus}`);
       return response.data;
     } catch (error) {
       core.info(`Error fetching report: ${error.message}`);

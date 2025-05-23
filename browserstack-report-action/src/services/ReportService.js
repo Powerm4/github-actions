@@ -16,11 +16,12 @@ class ReportService {
           Authorization: this.authHeader,
         },
       });
-      core.info(`Response from report API: ${JSON.stringify(response.data)}`);
+
       if (response.status < 200 || response.status > 299) {
         core.info(`Error fetching report: ${response.status}`);
         return ReportService.errorResponse(response?.data?.errorMessage || "Something Went Wrong while Fetching report");
       }
+      core.info(`Response from report API: ${response?.data?.reportStatus}`);
       return response.data;
     } catch (error) {
       core.info(`Error fetching report: ${error.message}`);
