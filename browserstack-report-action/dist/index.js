@@ -38230,7 +38230,6 @@ class ReportProcessor {
   async processReport() {
     try {
       const { summary } = core;
-      await summary.addHeading('BrowserStack Test Report');
 
       let addToSummaryReport = this.reportData?.report?.basicHtml;
       if (addToSummaryReport) {
