@@ -14,8 +14,8 @@ class ReportProcessor {
       let addToSummaryReport = this.reportData?.report?.basicHtml;
       if (addToSummaryReport) {
         addToSummaryReport = `<html>${addToSummaryReport}</html>`;
-        //remove curly quotes with normal double quotes
         addToSummaryReport = addToSummaryReport.replace(/[\u201C\u201D]/g, '"');
+        addToSummaryReport = addToSummaryReport.replace(/"(target="_blank")/g, '" $1');
         core.info(`Report HTML: ${addToSummaryReport}`);
         await summary.addRaw(addToSummaryReport, false);
       } else {
