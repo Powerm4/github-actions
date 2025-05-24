@@ -5,8 +5,7 @@ const constants = require('../../config/constants');
 class ReportService {
   constructor(authHeader) {
     this.authHeader = authHeader;
-    // this.apiUrl = 'https://api-observability.browserstack.com/ext/v1/builds/buildReport';
-    this.apiUrl = 'https://api-observability-preprod.bsstag.com/ext/v1/builds/buildReport';
+    this.apiUrl = 'https://api-observability.browserstack.com/ext/v1/builds/buildReport';
   }
 
   async fetchReport(params) {

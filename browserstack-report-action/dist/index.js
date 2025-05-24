@@ -38273,8 +38273,7 @@ const constants = __nccwpck_require__(9350);
 class ReportService {
   constructor(authHeader) {
     this.authHeader = authHeader;
-    // this.apiUrl = 'https://api-observability.browserstack.com/ext/v1/builds/buildReport';
-    this.apiUrl = 'https://api-observability-preprod.bsstag.com/ext/v1/builds/buildReport';
+    this.apiUrl = 'https://api-observability.browserstack.com/ext/v1/builds/buildReport';
   }
 
   async fetchReport(params) {
