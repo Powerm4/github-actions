@@ -38164,6 +38164,19 @@ async function run() {
     const {
       username, accessKey, buildName, userTimeout,
     } = actionInput.getInputs();
+
+    let reportProcessor;
+
+    if (userTimeout < 20 || userTimeout > 600) {
+      const report = {
+        report: {
+          basicHtml: `<pre>Invalid user timeout value: ${userTimeout}. It should be between 20 and 600 seconds for Browserstack reports</pre>`,
+        },
+      };
+      reportProcessor = new ReportProcessor(report);
+      return;
+    }
+
     const authHeader = `Basic ${Buffer.from(`${username}:${accessKey}`).toString('base64')}`;
 
     const timeManager = new TimeManager(userTimeout
@@ -38199,7 +38212,7 @@ async function run() {
       );
     }
 
-    const reportProcessor = new ReportProcessor(reportData);
+    reportProcessor = new ReportProcessor(reportData);
     await reportProcessor.processReport();
     core.info('Report processing completed successfully');
   } catch (error) {
