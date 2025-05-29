@@ -23,6 +23,7 @@ async function run() {
         },
       };
       reportProcessor = new ReportProcessor(report);
+      await reportProcessor.processReport();
       return;
     }
 
