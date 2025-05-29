@@ -38170,7 +38170,7 @@ async function run() {
     if (userTimeout < 20 || userTimeout > 600) {
       const report = {
         report: {
-          basicHtml: `<pre>Invalid user timeout value: ${userTimeout}. It should be between 20 and 600 seconds for Browserstack reports</pre>`,
+          basicHtml: `<pre>Invalid report timeout value: ${userTimeout}. It should be between 20 and 600 seconds for Browserstack reports</pre>`,
         },
       };
       reportProcessor = new ReportProcessor(report);
