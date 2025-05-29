@@ -16,14 +16,14 @@ async function run() {
 
     let reportProcessor;
 
-    if(userTimeout < 20 || userTimeout > 600) {
+    if (userTimeout < 20 || userTimeout > 600) {
       const report = {
         report: {
           basicHtml: `<pre>Invalid user timeout value: ${userTimeout}. It should be between 20 and 600 seconds for Browserstack reports</pre>`,
         },
-      }
+      };
       reportProcessor = new ReportProcessor(report);
-      return ;
+      return;
     }
 
     const authHeader = `Basic ${Buffer.from(`${username}:${accessKey}`).toString('base64')}`;
