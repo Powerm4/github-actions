@@ -38106,8 +38106,6 @@ class InputValidator {
    * Validates the build-name based on the input.
    * If no build name is provided, generates one using workflow name and run ID.
    * @param {String} buildName - Action input for 'build-name'
-   * @param {String} workflow - The GitHub workflow name
-   * @param {String} runId - The GitHub run ID
    * @returns {String} Validated/default build name
    */
   static validateBuildName(inputBuildName) {
