@@ -3,6 +3,11 @@
   "version": "1.0.3",
   "description": "Setup BrowserStack Local Binary",
   "main": "src/index.js",
+  "overrides": {
+    "@octokit/request": "8.4.1",
+    "@octokit/plugin-paginate-rest": "9.2.2",
+    "@octokit/request-error": "5.1.1"
+  },
   "scripts": {
     "lint": "eslint . --ext .js",
     "build": "ncc build src/index.js",
@@ -27,12 +32,12 @@
   "license": "MIT",
   "dependencies": {
     "@actions/artifact": "^2.3.2",
-    "@actions/core": "^1.2.6",
+    "@actions/core": "^1.9.1",
     "@actions/exec": "^1.0.4",
-    "@actions/github": "^4.0.0",
+    "@actions/github": "^6.0.0",
     "@actions/io": "^1.0.2",
     "@actions/tool-cache": "^1.6.0",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
@@ -42,7 +47,7 @@
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
     "husky": "^4.2.5",
-    "mocha": "^8.1.1",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "sinon": "^9.0.2"
   },
