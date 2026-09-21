@@ -94,20 +94,45 @@ class ActionInput {
   }
 
   async checkIfBStackReRun() {
-    // Ensure rerunAttempt is a number and greater than 1
+    // Attempt 1 is an ordinary run, not a re-run — stay silent, this is not a failure.
     if (!this.rerunAttempt || Number(this.rerunAttempt) <= 1) {
       return false;
     }
 
-    // Ensure runId, repository, username, and accessKey are valid
-    if (!this.runId || !this.repository || this.repository === 'none'
-      || !this.githubToken || this.githubToken === 'none' || !this.username || !this.accessKey) {
+    // Past this point GitHub re-ran the workflow, so the failed-test list was meant to be
+    // delivered. Every bail below silently degrades the re-run into a full-suite run, which
+    // is indistinguishable from correct behaviour unless we say so here (SDK-7461).
+    const missing = [];
+    if (!this.githubToken || this.githubToken === 'none') missing.push("the 'github-token' input");
+    if (!this.runId) missing.push('GITHUB_RUN_ID');
+    if (!this.repository || this.repository === 'none') missing.push('GITHUB_REPOSITORY');
+    if (!this.username) missing.push("the 'username' input");
+    if (!this.accessKey) missing.push("the 'access-key' input");
+
+    if (missing.length) {
+      core.warning(`This is re-run attempt ${this.rerunAttempt}, but BrowserStack cannot deliver the failed-test list because ${missing.join(', ')} ${missing.length > 1 ? 'are' : 'is'} not set. Every test will run again instead of only the failed ones. Pass github-token to this action to enable re-running only failed tests.`);
       return false;
     }
 
     const triggeringActor = process.env.GITHUB_TRIGGERING_ACTOR;
+
+    // The actor check is only a cheap pre-filter; the rebuild/details endpoint is the
+    // authority on whether BrowserStack triggered this re-run, and it returns no variables
+    // when it did not. GITHUB_TRIGGERING_ACTOR comes from the runner binary, so a
+    // self-hosted runner can simply not set it — bailing there would turn a working re-run
+    // into a full-suite run on an otherwise correct setup (SDK-7461). Ask the API instead.
+    if (!triggeringActor) {
+      core.warning(`This is re-run attempt ${this.rerunAttempt} and the runner did not report GITHUB_TRIGGERING_ACTOR, so BrowserStack cannot pre-confirm that it triggered this re-run — asking BrowserStack directly instead. This variable is set by the runner itself; on a self-hosted runner, updating the runner restores the faster check.`);
+      return true;
+    }
+
     core.info(`Triggering actor is - ${triggeringActor}`);
-    return triggeringActor === this.githubApp;
+    if (triggeringActor !== this.githubApp) {
+      core.info(`This re-run was started by '${triggeringActor}', not by the BrowserStack GitHub App ('${this.githubApp}'), so there is no failed-test list to apply and every test will run again. Re-runs started from the BrowserStack dashboard run only the failed tests; check that the BrowserStack GitHub App is installed on ${this.repository}.`);
+      return false;
+    }
+
+    return true;
   }
 
   async setBStackRerunEnvVars() {
@@ -143,7 +168,8 @@ class ActionInput {
         });
       }
     } catch (error) {
-      core.info(`Error setting BrowserStack rerun environment variables: ${error.message}`);
+      // Swallowing this as info hid a total delivery failure behind a normal-looking log.
+      core.warning(`Could not fetch the failed-test list from BrowserStack (${error.message}). Every test will run again instead of only the failed ones.`);
     }
   }
 }

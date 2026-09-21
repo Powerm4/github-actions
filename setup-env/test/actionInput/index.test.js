@@ -241,6 +241,51 @@ describe('Action Input operations for fetching all inputs, triggering validation
       expect(result).to.be.false;
       delete process.env.GITHUB_TRIGGERING_ACTOR;
     });
+
+    it('Falls through to the API when the runner reports no triggering actor (SDK-7461)', async () => {
+      // Self-hosted runners set GITHUB_TRIGGERING_ACTOR only from a certain runner version.
+      // The actor check is a pre-filter, not the authority — bailing here turned a working
+      // re-run into a full-suite run on an otherwise correct setup.
+      const coreWarningStub = sinon.stub(core, 'warning');
+      const actionInput = new ActionInput();
+      delete process.env.GITHUB_TRIGGERING_ACTOR;
+
+      const result = await actionInput.checkIfBStackReRun();
+
+      // eslint-disable-next-line no-unused-expressions
+      expect(result).to.be.true;
+      sinon.assert.calledWith(coreWarningStub, sinon.match(/did not report GITHUB_TRIGGERING_ACTOR/));
+      sinon.assert.calledWith(coreWarningStub, sinon.match(/asking BrowserStack directly/));
+      sinon.assert.neverCalledWith(coreWarningStub, sinon.match(/GitHub App is installed/));
+    });
+
+    it('Warns which input is missing when a re-run cannot be delivered (SDK-7461)', async () => {
+      // Without this the job log for a degraded re-run is byte-identical to a healthy
+      // run, so "all tests ran again" is undiagnosable from the customer's side.
+      const coreWarningStub = sinon.stub(core, 'warning');
+      const actionInput = new ActionInput();
+      actionInput.githubToken = 'none';
+
+      const result = await actionInput.checkIfBStackReRun();
+
+      // eslint-disable-next-line no-unused-expressions
+      expect(result).to.be.false;
+      sinon.assert.calledWith(coreWarningStub, sinon.match(/github-token/));
+      sinon.assert.calledWith(coreWarningStub, sinon.match(/Every test will run again/));
+    });
+
+    it('Explains a human-triggered re-run rather than failing silently (SDK-7461)', async () => {
+      const coreInfoStub = sinon.stub(core, 'info');
+      const actionInput = new ActionInput();
+      process.env.GITHUB_TRIGGERING_ACTOR = 'someHuman';
+
+      const result = await actionInput.checkIfBStackReRun();
+
+      // eslint-disable-next-line no-unused-expressions
+      expect(result).to.be.false;
+      sinon.assert.calledWith(coreInfoStub, sinon.match(/not by the BrowserStack GitHub App/));
+      delete process.env.GITHUB_TRIGGERING_ACTOR;
+    });
   });
 
   context('Set BrowserStack Rerun Environment Variables', () => {
@@ -320,13 +365,39 @@ describe('Action Input operations for fetching all inputs, triggering validation
     });
 
     it('Handles errors when BrowserStack API fails', async () => {
+      // SDK-7461: a delivery failure is a warning, not info — as info it was
+      // indistinguishable from a healthy run in the job log.
+      const coreWarningStub = sinon.stub(core, 'warning');
       const actionInput = new ActionInput();
       axiosGetStub.rejects(new Error('API failed'));
 
       await actionInput.setBStackRerunEnvVars();
 
-      sinon.assert.calledTwice(core.info);
+      sinon.assert.calledWith(coreWarningStub, sinon.match(/API failed/));
+      sinon.assert.calledWith(coreWarningStub, sinon.match(/Every test will run again/));
       sinon.assert.neverCalledWith(core.exportVariable, sinon.match.any, sinon.match.any);
+    });
+
+    it('Exports BROWSERSTACK_BUILD_RUN_IDENTIFIER from the API response (SDK-7461)', async () => {
+      // Regression: the rebuild/details response carries this alongside RERUN/RERUN_TESTS,
+      // and the SDKs send it as build_run_identifier to link a re-run to its parent build
+      // run. It was absent from ALLOWED_RERUN_ENV_VARS, so the allowlist dropped it.
+      const actionInput = new ActionInput();
+      axiosGetStub.resolves({
+        data: {
+          data: {
+            variables: {
+              BROWSERSTACK_RERUN: 'true',
+              BROWSERSTACK_RERUN_TESTS: 'cypress/tests/A/spec1.ts,cypress/tests/B/spec2.ts',
+              BROWSERSTACK_BUILD_RUN_IDENTIFIER: '1784546348645-29728341550',
+            },
+          },
+        },
+      });
+
+      await actionInput.setBStackRerunEnvVars();
+
+      sinon.assert.calledWith(core.exportVariable, 'BROWSERSTACK_BUILD_RUN_IDENTIFIER', '1784546348645-29728341550');
     });
   });
 });
